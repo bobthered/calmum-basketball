@@ -1,0 +1,15 @@
+{
+	"Mongoose Model": {
+		"prefix": "Mongoose Model",
+		"body": [
+			"import mongoose from 'mongoose';",
+			"",
+			"export const $1Schema = new mongoose.Schema({",
+			"\tfirstName: { type: String, required: true },",
+			"\tlastName: { type: String, required: true }",
+			"});",
+			"",
+			"export const $2 = mongoose.model('$2', $1Schema);"
+		]
+	}
+}
