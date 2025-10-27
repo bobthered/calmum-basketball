@@ -9,6 +9,15 @@ const config = {
 		adapter: adapter(),
 		alias: {
 			$components: 'src/components'
+		},
+		experimental: {
+			remoteFunctions: true
+		}
+	},
+
+	compilerOptions: {
+		experimental: {
+			async: true
 		}
 	}
 };
