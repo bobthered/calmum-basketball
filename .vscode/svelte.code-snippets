@@ -1,0 +1,55 @@
+{
+	"Create Component": {
+		"prefix": "Create component",
+		"body": [
+			"<script lang=\"ts\">",
+			"\timport { type Snippet } from 'svelte';",
+			"\timport { type Attachment } from 'svelte/attachments';",
+			"\timport { type HTMLAttributes } from 'svelte/elements';",
+			"\timport { twMerge } from 'tailwind-merge';",
+			"",
+			"\ttype Props = Omit<HTMLAttributes<$1>, ${2:'class' | 'style'}> & {",
+			"\t\tattachments?: Attachment[];",
+			"\t\tchildren?: Snippet;",
+			"\t\tclass?: string;",
+			"\t\telement?: $1 | null;",
+			"\t\tstyle?: string;",
+			"\t\tvariants?: string[];",
+			"\t};",
+			"\tlet {",
+			"\t\tattachments = \\$bindable([]),",
+			"\t\tchildren,",
+			"\t\tclass: className,",
+			"\t\telement = \\$bindable(null),",
+			"\t\tstyle,",
+			"\t\tvariants = [],",
+			"\t\t...restProps",
+			"\t}: Props = \\$props();",
+			"</script>",
+			"",
+			"<$3",
+			"\t{...restProps}",
+			"\tbind:this={element}",
+			"\tclass={twMerge(",
+			"\t\tclassName",
+			"\t)}",
+			"\t{style}",
+			">",
+			"\t{#if children}",
+			"\t\t{@render children()}",
+			"\t{/if}",
+			"</$3>"
+		],
+		"description": "Boilerplate for creating a component"
+	},
+	"Fix Component Class": {
+		"prefix": "Fix component class",
+		"body": [
+			"class={twMerge(",
+			"\t\\$theme.$1.default,",
+			"\t...variants.map((variant: string) => \\$theme.$1[variant]),",
+			"\tclassName",
+			")}"
+		]
+	}
+}
