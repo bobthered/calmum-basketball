@@ -26,10 +26,7 @@
 <main
 	{...restProps}
 	bind:this={element}
-	class={twMerge(
-		'mx-auto max-w-7xl space-y-6 p-4 pb-[calc(env(safe-area-inset-bottom)+4rem)] lg:pb-4',
-		className
-	)}
+	class={twMerge('mx-auto max-w-7xl px-4', className)}
 	{style}
 >
 	{#if children}
