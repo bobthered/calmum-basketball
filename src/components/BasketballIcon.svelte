@@ -12,7 +12,13 @@
 	let { class: className, element = $bindable(null), style, ...restProps }: Props = $props();
 </script>
 
-<svg {...restProps} bind:this={element} class={twMerge(className)} {style} viewBox="0 0 24 24">
+<svg
+	{...restProps}
+	bind:this={element}
+	class={twMerge('h-6 w-6', className)}
+	{style}
+	viewBox="0 0 24 24"
+>
 	<path
 		fill-rule="evenodd"
 		clip-rule="evenodd"

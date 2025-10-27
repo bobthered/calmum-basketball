@@ -26,7 +26,7 @@
 <main
 	{...restProps}
 	bind:this={element}
-	class={twMerge('mx-auto max-w-7xl px-4', className)}
+	class={twMerge('mx-auto w-full max-w-7xl overflow-auto px-4', className)}
 	{style}
 >
 	{#if children}

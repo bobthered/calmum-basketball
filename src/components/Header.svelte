@@ -26,7 +26,7 @@
 <header
 	{...restProps}
 	bind:this={element}
-	class={twMerge('flex items-center justify-center lg:justify-between', className)}
+	class={twMerge('mx-auto flex w-full max-w-7xl items-center justify-between lg:px-4', className)}
 	{style}
 >
 	{#if children}

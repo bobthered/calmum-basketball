@@ -9,7 +9,9 @@
 		children?: Snippet;
 		class?: string;
 		element?: HTMLInputElement | null;
+		name?: string;
 		readonly?: boolean;
+		required?: boolean;
 		style?: string;
 		type?: string;
 		value?: string;
@@ -20,7 +22,9 @@
 		children,
 		class: className,
 		element = $bindable(null),
+		name,
 		readonly,
+		required,
 		style,
 		type,
 		value = $bindable(''),
@@ -34,10 +38,12 @@
 	bind:this={element}
 	bind:value
 	class={twMerge(
-		'rounded bg-white px-6 py-3 shadow-sm outline-2 outline-transparent transition duration-200 hover:outline-gray-950/30 focus:outline-primary-500 dark:bg-gray-900 dark:hover:outline-gray-50/30 dark:focus:outline-primary-500',
+		'rounded bg-white px-6 py-3 shadow-sm outline-2 outline-transparent transition duration-200 hover:outline-gray-950/30 focus:outline-primary-700 dark:bg-gray-900 dark:hover:outline-gray-50/30 dark:focus:outline-primary-700',
 		className
 	)}
+	{name}
 	{readonly}
+	{required}
 	{style}
 	{type}
 />

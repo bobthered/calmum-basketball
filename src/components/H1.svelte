@@ -23,12 +23,7 @@
 	}: Props = $props();
 </script>
 
-<h1
-	{...restProps}
-	bind:this={element}
-	class={twMerge('text-center text-5xl font-bold uppercase', className)}
-	{style}
->
+<h1 {...restProps} bind:this={element} class={twMerge('text-5xl font-bold', className)} {style}>
 	{#if children}
 		{@render children()}
 	{/if}
