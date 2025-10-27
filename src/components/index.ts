@@ -20,3 +20,4 @@ export { default as RadioInput } from './RadioInput.svelte';
 export { default as RadioInputHandle } from './RadioInputHandle.svelte';
 export { default as SignUpModal } from './SignUpModal.svelte';
 export { default as Spinner } from './Spinner.svelte';
+export { default as SubmitButton } from './SubmitButton.svelte';
