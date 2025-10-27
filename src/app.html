@@ -6,9 +6,11 @@
 		%sveltekit.head%
 	</head>
 	<body
-		class="bg-gray-50 text-gray-950 selection:bg-primary-500 selection:text-white dark:bg-gray-950 dark:text-gray-50"
+		class="bg-gray-50 text-gray-950 selection:bg-primary-700 selection:text-white dark:bg-gray-950 dark:text-gray-50"
 		data-sveltekit-preload-data="hover"
 	>
-		<div style="display: contents">%sveltekit.body%</div>
+		<div class="flex max-h-screen min-h-screen min-w-screen flex-col lg:flex-col-reverse">
+			%sveltekit.body%
+		</div>
 	</body>
 </html>
