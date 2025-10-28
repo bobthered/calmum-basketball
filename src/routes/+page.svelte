@@ -14,7 +14,7 @@
 	const statuses = ['Yes', 'Maybe', 'No'];
 	const updateRows = async () => {
 		try {
-			const result = await findUserCalendarStatus({ date });
+			const result = await findUserCalendarStatus({ date: dateString });
 			if (result.success) {
 				rows = result.rows.sort((a: any, b: any) =>
 					`${a._userId.firstName} ${b._userId.lastName}`.localeCompare(
@@ -27,10 +27,23 @@
 	};
 
 	// $derives
-	const date = $derived.by(() => {
-		const now = new Date();
-		const formattedDate = now.toISOString().slice(0, 10);
+	const date = $derived.by(() => new Date());
+	const dateString = $derived.by(() => {
+		const formattedDate = date.toISOString().slice(0, 10);
 		return formattedDate;
+	});
+	const listDates = $derived.by(() =>
+		scheduledDates.value
+			.map((dateString) => {
+				const date = new Date(dateString);
+				date.setUTCHours(24);
+				return date;
+			})
+			.filter((date) => date.getTime() >= new Date().getTime())
+			.sort((a, b) => a.getTime() - b.getTime())
+	);
+	const nextBasketballDate = $derived.by(() => {
+		return new Date(listDates[0]);
 	});
 
 	// $effects
@@ -41,7 +54,7 @@
 
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
-	{#if scheduledDates.value.includes(date)}
+	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex items-center space-x-4">
 			<Div class="aspect-square w-6 rounded-full bg-green-500" />
 			<Div>Basketball is scheduled for tonight.</Div>
@@ -56,7 +69,7 @@
 								if (!user.value) throw 'No User';
 								await updateUserCalendarStatus({
 									_userId: user.value._id,
-									date,
+									date: dateString,
 									status
 								});
 								isRowsPending = true;
@@ -99,5 +112,12 @@
 		</Card>
 	{:else}
 		<Div>No Basketball Scheduled For Today</Div>
+		<Div
+			>The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
+				month: 'long',
+				day: 'numeric',
+				weekday: 'long'
+			})}</Div
+		>
 	{/if}
 {/if}
