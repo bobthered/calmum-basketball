@@ -75,21 +75,19 @@
 	});
 </script>
 
-<Div class="flex flex-col space-y-6 overflow-auto p-4">
-	<H1>Calendar</H1>
-	<FormControl label="View">
-		<Div class="flex space-x-2">
-			{#each views as value}
-				<RadioInput bind:group={view} {value} />
-			{/each}
-		</Div>
-	</FormControl>
-	{#if view === 'Month'}
-		{@render monthView()}
-	{:else if view === 'List'}
-		{@render listView()}
-	{/if}
-</Div>
+<H1>Calendar</H1>
+<FormControl label="View">
+	<Div class="flex space-x-2">
+		{#each views as value}
+			<RadioInput bind:group={view} {value} />
+		{/each}
+	</Div>
+</FormControl>
+{#if view === 'Month'}
+	{@render monthView()}
+{:else if view === 'List'}
+	{@render listView()}
+{/if}
 
 {#snippet daySnippet(calendarDate: CalendarDate)}
 	{#if user.value}

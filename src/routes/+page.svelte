@@ -40,66 +40,64 @@
 </script>
 
 {#if user.value}
-	<Div class="flex flex-col space-y-6 p-4">
-		<H1>Hi {user.value.firstName}!</H1>
-		{#if scheduledDates.value.includes(date)}
-			<Div class="flex items-center space-x-4">
-				<Div class="aspect-square w-6 rounded-full bg-green-500" />
-				<Div>Basketball is scheduled for tonight.</Div>
+	<H1>Hi {user.value.firstName}!</H1>
+	{#if scheduledDates.value.includes(date)}
+		<Div class="flex items-center space-x-4">
+			<Div class="aspect-square w-6 rounded-full bg-green-500" />
+			<Div>Basketball is scheduled for tonight.</Div>
+		</Div>
+		<Div class="flex items-center space-x-4">
+			<Div>Will you be coming?</Div>
+			<Div class="flex space-x-2">
+				{#each statuses as status}
+					<Button
+						onclick={async () => {
+							try {
+								if (!user.value) throw 'No User';
+								await findOneAndUpdateUserCalendarStatus({
+									_userId: user.value._id,
+									date,
+									status
+								});
+								isRowsPending = true;
+							} catch (error) {}
+						}}
+					>
+						{status}
+					</Button>
+				{/each}
 			</Div>
-			<Div class="flex items-center space-x-4">
-				<Div>Will you be coming?</Div>
-				<Div class="flex space-x-2">
-					{#each statuses as status}
-						<Button
-							onclick={async () => {
-								try {
-									if (!user.value) throw 'No User';
-									await findOneAndUpdateUserCalendarStatus({
-										_userId: user.value._id,
-										date,
-										status
-									});
-									isRowsPending = true;
-								} catch (error) {}
-							}}
+		</Div>
+		<Card class="grid grid-cols-[auto_auto] overflow-hidden p-0 lg:mr-auto">
+			<Div class="bg-primary-700 px-6 py-3 text-white">Name</Div>
+			<Div class="bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
+			{#if !isRowsPending}
+				{#if rows.length !== 0}
+					{#each rows as { _userId, status }, rowIndex}
+						<Div
+							class={twMerge(
+								'px-6 py-3',
+								rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined
+							)}>{_userId.firstName} {_userId.lastName}</Div
 						>
-							{status}
-						</Button>
+						<Div
+							class={twMerge(
+								'px-6 py-3',
+								rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
+								'text-center'
+							)}>{status}</Div
+						>
 					{/each}
-				</Div>
-			</Div>
-			<Card class="grid grid-cols-[auto_auto] overflow-hidden p-0 lg:mr-auto">
-				<Div class="bg-primary-700 px-6 py-3 text-white">Name</Div>
-				<Div class="bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
-				{#if !isRowsPending}
-					{#if rows.length !== 0}
-						{#each rows as { _userId, status }, rowIndex}
-							<Div
-								class={twMerge(
-									'px-6 py-3',
-									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined
-								)}>{_userId.firstName} {_userId.lastName}</Div
-							>
-							<Div
-								class={twMerge(
-									'px-6 py-3',
-									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
-									'text-center'
-								)}>{status}</Div
-							>
-						{/each}
-					{:else}
-						<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
-					{/if}
 				{:else}
-					<Div class="col-span-2 px-6 py-3">
-						<Spinner />
-					</Div>
+					<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
 				{/if}
-			</Card>
-		{:else}
-			<Div>No Basketball Scheduled For Today</Div>
-		{/if}
-	</Div>
+			{:else}
+				<Div class="col-span-2 px-6 py-3">
+					<Spinner />
+				</Div>
+			{/if}
+		</Card>
+	{:else}
+		<Div>No Basketball Scheduled For Today</Div>
+	{/if}
 {/if}
