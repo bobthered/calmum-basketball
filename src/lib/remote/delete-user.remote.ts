@@ -4,7 +4,7 @@ import { form } from '$app/server';
 import { connect } from '$lib/mongoose/connect';
 import { User } from '$lib/mongoose/models';
 
-export const findOneAndDeleteUser = form(
+export const deleteUser = form(
 	v.object({
 		_id: v.pipe(v.string(), v.nonEmpty())
 	}),

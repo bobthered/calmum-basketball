@@ -43,7 +43,7 @@
 		{#if snippet}
 			{@render snippet()}
 		{:else}
-			<Card class="mx-auto my-auto flex w-full max-w-sm flex-col">
+			<Card class="mx-auto my-auto flex w-full max-w-sm flex-col overflow-auto">
 				{#if children}
 					{@render children()}
 				{/if}

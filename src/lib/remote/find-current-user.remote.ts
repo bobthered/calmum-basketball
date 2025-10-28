@@ -4,7 +4,7 @@ import { query } from '$app/server';
 import { connect } from '$lib/mongoose/connect';
 import { User } from '$lib/mongoose/models';
 
-export const findOneUser = query(
+export const findCurrentUser = query(
 	v.object({
 		_id: v.pipe(v.string(), v.nonEmpty())
 	}),

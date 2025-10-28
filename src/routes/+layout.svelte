@@ -1,10 +1,21 @@
 <script lang="ts">
-	import { Calendar, CircleUserRound } from '@lucide/svelte';
-	import { BasketballIcon, Div, H1, Header, Main, Modal, Nav, NavItem, Spinner } from '$components';
+	import { Calendar, CircleUserRound, LogOut } from '@lucide/svelte';
+	import {
+		BasketballIcon,
+		Button,
+		Div,
+		H1,
+		Header,
+		Main,
+		Modal,
+		Nav,
+		NavItem,
+		Spinner
+	} from '$components';
 	import SignUpModal from '$components/SignUpModal.svelte';
-	import { user } from '$lib/user';
-	import { findCalendar } from '$lib/mongoose/remote/find/calendar.remote';
+	import { findCalendar } from '$lib/remote/find-calendar.remote';
 	import { scheduledDates } from '$lib/scheduledDates';
+	import { user } from '$lib/user';
 	import '../app.css';
 
 	let { children } = $props();
@@ -17,6 +28,10 @@
 		{ href: '/my-account', Icon: CircleUserRound, label: 'My Account' }
 	]);
 
+	const signOut = () => {
+		localStorage.removeItem('_id');
+		user.value = null;
+	};
 	const updateScheduledDates = async () => {
 		const result = await findCalendar();
 		scheduledDates.value = result.map(({ date }: { date: string }) => date);
@@ -54,19 +69,28 @@
 		{@render children?.()}
 	{/if}
 </Main>
-<Header class="bg-primary-700 text-white">
-	<Div class="jusity-between mx-auto flex w-full max-w-7xl items-center lg:px-4">
-		<Div class="hidden items-center space-x-4 lg:flex">
-			<BasketballIcon class="h-16 w-16" />
-			<H1 class="whitespace-nowrap">Cal-Mum Rec. Basketball</H1>
+{#if user.value !== null}
+	<Header class="bg-primary-700 text-white">
+		<Div class="jusity-between mx-auto flex w-full max-w-7xl items-center lg:px-4">
+			<Div class="hidden items-center space-x-4 lg:flex">
+				<BasketballIcon class="h-16 w-16" />
+				<H1 class="whitespace-nowrap">Cal-Mum Rec. Basketball</H1>
+			</Div>
+			<Nav navItemCount={nav.length + 1}>
+				{#each nav as { href, Icon, label }}
+					<NavItem {href} {Icon} {label} />
+				{/each}
+				<Button
+					class="flex flex-col items-center text-white lg:bg-primary-200 lg:text-primary-700 lg:hover:bg-primary-100"
+					onclick={() => signOut()}
+				>
+					<LogOut class="lg:hidden" />
+					<Div class="text-xs lg:text-base">Sign Out</Div>
+				</Button>
+			</Nav>
 		</Div>
-		<Nav navItemCount={nav.length}>
-			{#each nav as { href, Icon, label }}
-				<NavItem {href} {Icon} {label} />
-			{/each}
-		</Nav>
-	</Div>
-</Header>
+	</Header>
+{/if}
 <SignUpModal />
 <Modal isOpen={isLoadingModalOpen}>
 	<Div class="flex flex-col items-center justify-center">

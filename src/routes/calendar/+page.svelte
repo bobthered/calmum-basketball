@@ -3,7 +3,7 @@
 	import { untrack } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { Button, Card, Div, FormControl, H1, RadioInput } from '$components';
-	import { updateCalendar } from '$lib/mongoose/remote/update/calendar.remote';
+	import { updateCalendar } from '$lib/remote/update-calendar.remote';
 	import { scheduledDates } from '$lib/scheduledDates';
 	import { user } from '$lib/user';
 
@@ -122,7 +122,7 @@
 					'flex h-12 items-center justify-center rounded lg:aspect-square',
 					calendarDate.date.getMonth() !== date.getMonth() ? 'opacity-50' : undefined,
 					calendarDate.date.getDay() === 1 || calendarDate.date.getDay() === 5
-						? 'bg-primary-700'
+						? 'bg-primary-700 text-white'
 						: undefined
 				)}
 			>

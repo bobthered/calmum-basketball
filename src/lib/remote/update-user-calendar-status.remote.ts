@@ -4,7 +4,7 @@ import { command } from '$app/server';
 import { connect } from '$lib/mongoose/connect';
 import { UserCalendarStatus } from '$lib/mongoose/models';
 
-export const findOneAndUpdateUserCalendarStatus = command(
+export const updateUserCalendarStatus = command(
 	v.object({
 		_userId: v.pipe(v.string(), v.nonEmpty()),
 		date: v.pipe(v.string(), v.nonEmpty()),

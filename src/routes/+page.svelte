@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { twMerge } from 'tailwind-merge';
 	import { Button, Card, Div, H1, Spinner } from '$components';
-	import { findUserCalendarStatus } from '$lib/mongoose/remote/find/userCalendarStatus.remote';
-	import { findOneAndUpdateUserCalendarStatus } from '$lib/mongoose/remote/findOneAndUpdate/userCalendarStatus.remote';
-	import { user } from '$lib/user';
+	import { findUserCalendarStatus } from '$lib/remote/find-user-calendar-status.remote';
+	import { updateUserCalendarStatus } from '$lib/remote/update-user-calendar-status.remote';
 	import { scheduledDates } from '$lib/scheduledDates';
+	import { user } from '$lib/user';
 
 	// $state
 	let isRowsPending = $state(true);
@@ -54,7 +54,7 @@
 						onclick={async () => {
 							try {
 								if (!user.value) throw 'No User';
-								await findOneAndUpdateUserCalendarStatus({
+								await updateUserCalendarStatus({
 									_userId: user.value._id,
 									date,
 									status

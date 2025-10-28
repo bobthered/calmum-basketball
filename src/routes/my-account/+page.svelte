@@ -1,4 +1,5 @@
 <script>
+	import { TriangleAlert } from '@lucide/svelte';
 	import {
 		Button,
 		Card,
@@ -10,15 +11,14 @@
 		Modal,
 		SubmitButton
 	} from '$components';
-	import { findOneAndDeleteUser } from '$lib/mongoose/remote/findOneAndDelete/user.remote';
-	import { findOneAndUpdateUser } from '$lib/mongoose/remote/findOneAndUpdate/user.remote';
+	import { deleteUser } from '$lib/remote/delete-user.remote';
+	import { updateUser } from '$lib/remote/update-user.remote';
 	import { user } from '$lib/user';
-	import { TriangleAlert } from '@lucide/svelte';
 
 	// $state
 	let isDeleteModalOpen = $state(false);
 	let isPending = $state(false);
-	let tempUser = $state({ _id: '', firstName: '', isAdmin: false, lastName: '' });
+	let tempUser = $state({ _id: '', firstName: '', isAdmin: false, lastName: '', username: '' });
 
 	// $effects
 	$effect(() => {
@@ -33,12 +33,12 @@
 	<Card class="lg:mr-auto">
 		<Form
 			class="flex flex-col space-y-6"
-			{...findOneAndUpdateUser.enhance(async ({ submit }) => {
+			{...updateUser.enhance(async ({ submit }) => {
 				try {
 					isPending = true;
 					await submit();
 					isPending = false;
-					if (findOneAndUpdateUser?.result?.success) {
+					if (updateUser?.result?.success) {
 						user.value = $state.snapshot(tempUser);
 					}
 				} catch (error) {}
@@ -73,12 +73,12 @@
 		<Div class="flex w-full justify-end space-x-4">
 			<Button onclick={() => (isDeleteModalOpen = false)}>Cancel</Button>
 			<Form
-				{...findOneAndDeleteUser.enhance(async ({ submit }) => {
+				{...deleteUser.enhance(async ({ submit }) => {
 					try {
 						isPending = true;
 						await submit();
 						isPending = false;
-						if (findOneAndDeleteUser?.result?.success) {
+						if (deleteUser?.result?.success) {
 							localStorage.removeItem('_id');
 							user.value = null;
 						}

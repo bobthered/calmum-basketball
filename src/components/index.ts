@@ -1,4 +1,5 @@
 export { default as BasketballIcon } from './BasketballIcon.svelte';
+export { default as ButtonA } from './ButtonA.svelte';
 export { default as Button } from './Button.svelte';
 export { default as Card } from './Card.svelte';
 export { default as CheckboxInput } from './CheckboxInput.svelte';
