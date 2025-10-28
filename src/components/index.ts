@@ -13,6 +13,7 @@ export { default as Header } from './Header.svelte';
 export { default as Input } from './Input.svelte';
 export { default as Label } from './Label.svelte';
 export { default as Main } from './Main.svelte';
+export { default as Modal } from './Modal.svelte';
 export { default as Nav } from './Nav.svelte';
 export { default as NavItem } from './NavItem.svelte';
 export { default as Popover } from './Popover.svelte';

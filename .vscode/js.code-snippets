@@ -11,5 +11,63 @@
 			"",
 			"export const $2 = mongoose.model('$2', $1Schema);"
 		]
+	},
+	"Remote Function: Command": {
+		"prefix": "RFCommand",
+		"body": [
+			"import { ObjectId } from 'mongodb';",
+			"import * as v from 'valibot';",
+			"import { command } from '\\$app/server';",
+			"import { connect } from '\\$lib/mongoose/connect';",
+			"import { $2 } from '\\$lib/mongoose/models';",
+			"",
+			"export const $1$2 = command(",
+			"\tv.object({",
+			"\t\t_id: v.pipe(v.string(), v.nonEmpty()),",
+			"\t\tfirstName: v.pipe(v.string(), v.nonEmpty()),",
+			"\t\tlastName: v.pipe(v.string(), v.nonEmpty())",
+			"\t}),",
+			"\tasync ({ _id, firstName, lastName }) => {",
+			"\t\tawait connect();",
+			"",
+			"\t\tawait $2.$1(",
+			"\t\t\t{ _id: new ObjectId(_id) },",
+			"\t\t\t{ firstName, lastName },",
+			"\t\t\t{ upsert: true }",
+			"\t\t);",
+			"",
+			"\t\treturn { success: true };",
+			"\t}",
+			");"
+		]
+	},
+	"Remote Function: Form": {
+		"prefix": "RFForm",
+		"body": [
+			"import { ObjectId } from 'mongodb';",
+			"import * as v from 'valibot';",
+			"import { form } from '\\$app/server';",
+			"import { connect } from '\\$lib/mongoose/connect';",
+			"import { $2 } from '\\$lib/mongoose/models';",
+			"",
+			"export const $1$2 = form(",
+			"\tv.object({",
+			"\t\t_id: v.pipe(v.string(), v.nonEmpty()),",
+			"\t\tfirstName: v.pipe(v.string(), v.nonEmpty()),",
+			"\t\tlastName: v.pipe(v.string(), v.nonEmpty())",
+			"\t}),",
+			"\tasync ({ _id, firstName, lastName }) => {",
+			"\t\tawait connect();",
+			"",
+			"\t\tawait $2.$1(",
+			"\t\t\t{ _id: new ObjectId(_id) },",
+			"\t\t\t{ firstName, lastName },",
+			"\t\t\t{ upsert: true }",
+			"\t\t);",
+			"",
+			"\t\treturn { success: true };",
+			"\t}",
+			");"
+		]
 	}
 }

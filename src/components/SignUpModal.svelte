@@ -4,10 +4,11 @@
 	import { type HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
 	import { browser } from '$app/environment';
-	import { Button, Card, Div, Form, FormControl, H1, Input, SubmitButton } from '$components';
+	import { Card, Div, Form, FormControl, H1, Input, SubmitButton } from '$components';
 	import { fade } from '$lib/transition';
-	import { signUp } from '$lib/mongoose/signUp.remote';
+	import { createUser } from '$lib/mongoose/remote/create/user.remote';
 	import { user } from '$lib/user';
+	import { findOneUser } from '$lib/mongoose/remote/findOne/user.remote';
 
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {
 		attachments?: Attachment[];
@@ -27,18 +28,31 @@
 		...restProps
 	}: Props = $props();
 
+	// $state
 	let isInitiated = $state(true);
-	let isSubmitting = $state(false);
+	let isPending = $state(false);
 	let firstName = $state('');
 	let lastName = $state('');
+
+	const updateUser = async (_id: string) => {
+		const result = await findOneUser({ _id });
+		user.value = {
+			_id: result.user._id,
+			firstName: result.user.firstName,
+			isAdmin: result.user.isAdmin,
+			lastName: result.user.lastName
+		};
+	};
 
 	// $effects
 	$effect(() => {
 		if (browser) {
-			const userString = localStorage.getItem('user');
-			if (!userString) isInitiated = false;
-			if (userString) {
-				user.value = JSON.parse(userString);
+			if (user.value === null) {
+				const _id = localStorage.getItem('_id');
+				if (!_id) isInitiated = false;
+				if (_id) {
+					updateUser(_id);
+				}
 			}
 		}
 	});
@@ -61,18 +75,19 @@
 			<Card class="mx-auto my-auto flex w-full max-w-sm flex-col">
 				<Form
 					class="flex flex-col space-y-6"
-					{...signUp.enhance(async ({ submit }) => {
+					{...createUser.enhance(async ({ submit }) => {
 						try {
-							isSubmitting = true;
+							isPending = true;
 							await submit();
-							isSubmitting = false;
-							if (signUp.result.success) {
+							isPending = false;
+							if (createUser.result.success) {
 								const userObject = {
-									_id: signUp.result._doc._id,
-									firstName: signUp.result._doc.firstName,
-									lastName: signUp.result._doc.lastName
+									_id: createUser.result._doc._id,
+									firstName: createUser.result._doc.firstName,
+									isAdmin: createUser.result._doc.isAdmin,
+									lastName: createUser.result._doc.lastName
 								};
-								localStorage.setItem('user', JSON.stringify(userObject));
+								localStorage.setItem('_id', createUser.result._doc._id);
 								user.value = userObject;
 								isInitiated = true;
 							}
@@ -98,7 +113,7 @@
 							/>
 						</FormControl>
 					</Div>
-					<SubmitButton bind:isSubmitting class="ml-auto">Sign Up</SubmitButton>
+					<SubmitButton bind:isPending class="ml-auto">Sign Up</SubmitButton>
 				</Form>
 			</Card>
 		{/if}

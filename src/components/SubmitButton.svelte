@@ -7,14 +7,14 @@
 		children?: Snippet;
 		class?: string;
 		element?: null;
-		isSubmitting: boolean;
+		isPending: boolean;
 		style?: string;
 	};
 	let {
 		children,
 		class: className,
 		element = $bindable(null),
-		isSubmitting = $bindable(false),
+		isPending = $bindable(false),
 		style,
 		...restProps
 	}: Props = $props();
@@ -30,7 +30,7 @@
 	<Div
 		class={twMerge(
 			'flex h-full w-full items-center justify-center transition duration-200',
-			isSubmitting ? 'translate-y-[200%]' : 'translate-y-0'
+			isPending ? 'translate-y-[200%]' : 'translate-y-0'
 		)}
 	>
 		{#if children}
@@ -40,7 +40,7 @@
 	<Div
 		class={twMerge(
 			'absolute top-0 left-0 flex h-full w-full items-center justify-center transition duration-200',
-			isSubmitting ? 'translate-y-0' : 'translate-y-[-200%]'
+			isPending ? 'translate-y-0' : 'translate-y-[-200%]'
 		)}
 	>
 		<Spinner />

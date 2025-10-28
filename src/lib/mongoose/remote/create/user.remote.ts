@@ -1,9 +1,9 @@
 import * as v from 'valibot';
 import { form } from '$app/server';
-import { User } from './models';
 import { connect } from '$lib/mongoose/connect';
+import { User } from '$lib/mongoose/models';
 
-export const signUp = form(
+export const createUser = form(
 	v.object({
 		firstName: v.pipe(v.string(), v.nonEmpty()),
 		lastName: v.pipe(v.string(), v.nonEmpty())

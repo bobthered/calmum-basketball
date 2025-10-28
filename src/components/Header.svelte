@@ -23,12 +23,7 @@
 	}: Props = $props();
 </script>
 
-<header
-	{...restProps}
-	bind:this={element}
-	class={twMerge('mx-auto flex w-full max-w-7xl items-center justify-between lg:px-4', className)}
-	{style}
->
+<header {...restProps} bind:this={element} class={twMerge('lg:py-4', className)} {style}>
 	{#if children}
 		{@render children()}
 	{/if}

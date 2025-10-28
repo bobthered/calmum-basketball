@@ -1,2 +1,105 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script lang="ts">
+	import { twMerge } from 'tailwind-merge';
+	import { Button, Card, Div, H1, Spinner } from '$components';
+	import { findUserCalendarStatus } from '$lib/mongoose/remote/find/userCalendarStatus.remote';
+	import { findOneAndUpdateUserCalendarStatus } from '$lib/mongoose/remote/findOneAndUpdate/userCalendarStatus.remote';
+	import { user } from '$lib/user';
+	import { scheduledDates } from '$lib/scheduledDates';
+
+	// $state
+	let isRowsPending = $state(true);
+	let rows: any[] = $state([]);
+
+	// variables
+	const statuses = ['Yes', 'Maybe', 'No'];
+	const updateRows = async () => {
+		try {
+			const result = await findUserCalendarStatus({ date });
+			if (result.success) {
+				rows = result.rows.sort((a: any, b: any) =>
+					`${a._userId.firstName} ${b._userId.lastName}`.localeCompare(
+						`${b._userId.firstName} ${b._userId.lastName}`
+					)
+				);
+				isRowsPending = false;
+			}
+		} catch (error) {}
+	};
+
+	// $derives
+	const date = $derived.by(() => {
+		const now = new Date();
+		const formattedDate = now.toISOString().slice(0, 10);
+		return formattedDate;
+	});
+
+	// $effects
+	$effect(() => {
+		if (isRowsPending) updateRows();
+	});
+</script>
+
+{#if user.value}
+	<Div class="flex flex-col space-y-6 p-4">
+		<H1>Hi {user.value.firstName}!</H1>
+		{#if scheduledDates.value.includes(date)}
+			<Div class="flex items-center space-x-4">
+				<Div class="aspect-square w-6 rounded-full bg-green-500" />
+				<Div>Basketball is scheduled for tonight.</Div>
+			</Div>
+			<Div class="flex items-center space-x-4">
+				<Div>Will you be coming?</Div>
+				<Div class="flex space-x-2">
+					{#each statuses as status}
+						<Button
+							onclick={async () => {
+								try {
+									if (!user.value) throw 'No User';
+									await findOneAndUpdateUserCalendarStatus({
+										_userId: user.value._id,
+										date,
+										status
+									});
+									isRowsPending = true;
+								} catch (error) {}
+							}}
+						>
+							{status}
+						</Button>
+					{/each}
+				</Div>
+			</Div>
+			<Card class="grid grid-cols-[auto_auto] overflow-hidden p-0 lg:mr-auto">
+				<Div class="bg-primary-700 px-6 py-3 text-white">Name</Div>
+				<Div class="bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
+				{#if !isRowsPending}
+					{#if rows.length !== 0}
+						{#each rows as { _userId, status }, rowIndex}
+							<Div
+								class={twMerge(
+									'px-6 py-3',
+									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined
+								)}>{_userId.firstName} {_userId.lastName}</Div
+							>
+							<Div
+								class={twMerge(
+									'px-6 py-3',
+									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
+									'text-center'
+								)}>{status}</Div
+							>
+						{/each}
+					{:else}
+						<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
+					{/if}
+				{:else}
+					<Div class="col-span-2 px-6 py-3">
+						<Spinner />
+					</Div>
+				{/if}
+			</Card>
+		{:else}
+			<Div>No Basketball Scheduled For Today</Div>
+		{/if}
+	</Div>
+{/if}
