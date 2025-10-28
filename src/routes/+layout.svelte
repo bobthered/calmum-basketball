@@ -81,7 +81,7 @@
 					<NavItem {href} {Icon} {label} />
 				{/each}
 				<Button
-					class="flex flex-col items-center pb-[max(env(safe-area-inset-bottom),0.75rem)] text-white lg:bg-primary-200 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100"
+					class="flex flex-col items-center pb-[max(env(safe-area-inset-bottom),.75rem)] text-white lg:bg-primary-200 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100"
 					onclick={() => signOut()}
 				>
 					<LogOut class="lg:hidden" />
