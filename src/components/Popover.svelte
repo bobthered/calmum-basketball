@@ -41,7 +41,7 @@
 
 				if (outerWidth < 1024) {
 					return `
-					transform: translate(0, calc(${4 * (1 - eased)}rem + (1 * env(safe-area-inset-bottom)) + ${(1 - eased) * 100}%))`;
+					transform: translate(0, calc(${3.25 * (1 - eased)}rem + (1 * max(env(safe-area-inset-bottom),.75rem)) + ${(1 - eased) * 100}%))`;
 				} else {
 					const scaleMinimum = 0.95;
 
@@ -76,7 +76,7 @@
 	{#if isOpen}
 		<div
 			class={twMerge(
-				'fixed bottom-[calc(env(safe-area-inset-bottom)+4rem)] left-0 z-1 max-h-[calc(100vh-6rem)] max-w-full min-w-full origin-bottom lg:absolute lg:left-auto lg:max-w-max',
+				'fixed bottom-[calc(max(env(safe-area-inset-bottom),.75rem)+3.25rem)] left-0 z-1 max-h-[calc(100vh-6rem)] max-w-full min-w-full origin-bottom lg:absolute lg:left-auto lg:max-w-max',
 				positionsMap.get(position)
 			)}
 			transition:customTransition={{ duration: 200 }}
