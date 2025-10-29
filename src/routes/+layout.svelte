@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
+	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
 		Card,
@@ -18,7 +19,6 @@
 	import { scheduledDates } from '$lib/scheduledDates';
 	import { user } from '$lib/user';
 	import '../app.css';
-	import { twMerge } from 'tailwind-merge';
 
 	let { children } = $props();
 
