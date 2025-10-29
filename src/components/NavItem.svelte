@@ -3,7 +3,6 @@
 	import { Button, Div } from '$components';
 	import { type Component, type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
 
 	type AnchorProps = BaseProps & { element?: HTMLAnchorElement | null; href: string; tag?: 'a' };
@@ -47,9 +46,9 @@
 		{...restProps}
 		bind:this={element as HTMLAnchorElement | null}
 		class={twMerge(
-			'z-2 flex flex-col items-center bg-primary-700 px-0 pt-3 pb-[max(env(safe-area-inset-bottom),.75rem)] text-white transition duration-200 hover:bg-primary-800 lg:rounded lg:px-6 lg:pb-3 lg:text-primary-700',
+			'z-2 flex flex-col items-center bg-primary-700 px-0 pt-3 pb-[max(env(safe-area-inset-bottom),.75rem)] text-white/50 transition duration-200 hover:bg-primary-800 lg:rounded lg:px-6 lg:pb-3 lg:text-primary-700',
 			href === page.url.pathname
-				? 'cursor-default bg-primary-800 lg:bg-white lg:hover:bg-white'
+				? 'cursor-default text-white lg:bg-white lg:hover:bg-white'
 				: 'lg:bg-primary-200 lg:hover:bg-primary-100',
 			className
 		)}
@@ -64,7 +63,7 @@
 		{...restProps}
 		bind:element={element as HTMLButtonElement | null}
 		class={twMerge(
-			'z-2 flex flex-col items-center rounded-none px-0 pb-[max(env(safe-area-inset-bottom),.75rem)] lg:rounded lg:bg-primary-200 lg:px-6 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100',
+			'z-2 flex flex-col items-center rounded-none px-0 pb-[max(env(safe-area-inset-bottom),.75rem)] text-white/50 focus:text-white lg:rounded lg:bg-primary-200 lg:px-6 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100',
 			className
 		)}
 	>

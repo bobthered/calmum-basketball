@@ -29,7 +29,7 @@
 	{...restProps}
 	bind:this={element}
 	class={twMerge(
-		'grid w-full grid-cols-[repeat(var(--nav-item-count),minmax(0,1fr))] lg:flex lg:justify-end lg:space-x-4',
+		'grid w-full grid-cols-[repeat(var(--nav-item-count),minmax(0,1fr))] shadow-[-0px_-1px_0px_0px_var(--color-primary-500)] lg:flex lg:justify-end lg:space-x-4 lg:shadow-none',
 		className
 	)}
 	style="--nav-item-count: {navItemCount};"
