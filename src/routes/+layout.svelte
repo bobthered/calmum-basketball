@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Calendar, CircleUserRound, LogOut } from '@lucide/svelte';
+	import { Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
 	import {
 		BasketballIcon,
-		Button,
+		Card,
 		Div,
 		H1,
 		Header,
@@ -10,6 +10,7 @@
 		Modal,
 		Nav,
 		NavItem,
+		Popover,
 		Spinner
 	} from '$components';
 	import SignUpModal from '$components/SignUpModal.svelte';
@@ -17,10 +18,16 @@
 	import { scheduledDates } from '$lib/scheduledDates';
 	import { user } from '$lib/user';
 	import '../app.css';
+	import { twMerge } from 'tailwind-merge';
 
 	let { children } = $props();
 
 	// $state
+	let adminNav = $state([
+		{ href: '/admin/calendar', Icon: Calendar, label: 'Calendar' },
+		{ href: '/admin/users', Icon: Users, label: 'Users' }
+	]);
+	let isAdminPopoverOpen = $state(false);
 	let isScheduledDateInitiated = $state(false);
 	let nav = $state([
 		{ href: '/', Icon: BasketballIcon, label: 'Home' },
@@ -40,6 +47,7 @@
 
 	// $derives
 	const isLoadingModalOpen = $derived.by(() => !isScheduledDateInitiated);
+	const navItemCount = $derived.by(() => nav.length + 1 + (user?.value?.isAdmin ? 1 : 0));
 
 	// $effects
 	$effect(() => {
@@ -70,23 +78,48 @@
 	{/if}
 </Main>
 {#if user.value !== null}
-	<Header class="bg-primary-700 text-white">
+	<Header class="z-2 bg-primary-700 text-white">
 		<Div class="jusity-between mx-auto flex w-full max-w-7xl items-center lg:px-4">
 			<Div class="hidden items-center space-x-4 lg:flex">
 				<BasketballIcon class="h-16 w-16" />
-				<H1 class="whitespace-nowrap">Cal-Mum Rec. Basketball</H1>
+				<H1 class="text-3xl whitespace-nowrap">Cal-Mum Rec. Basketball</H1>
 			</Div>
-			<Nav navItemCount={nav.length + 1}>
+			<Nav {navItemCount}>
 				{#each nav as { href, Icon, label }}
 					<NavItem {href} {Icon} {label} />
 				{/each}
-				<Button
-					class="flex flex-col items-center pb-[max(env(safe-area-inset-bottom),.75rem)] text-white lg:bg-primary-200 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100"
-					onclick={() => signOut()}
-				>
-					<LogOut class="lg:hidden" />
-					<Div class="text-xs lg:text-base">Sign Out</Div>
-				</Button>
+				{#if user.value.isAdmin}
+					<Popover bind:isOpen={isAdminPopoverOpen} class="flex flex-col items-center">
+						{#snippet triggerSnippet()}
+							<NavItem
+								class={twMerge(
+									'w-full',
+									isAdminPopoverOpen ? 'bg-primary-800 lg:bg-white' : undefined
+								)}
+								Icon={ShieldUser}
+								label="Admin"
+								onclick={() => (isAdminPopoverOpen = !isAdminPopoverOpen)}
+								tag="button"
+							/>
+						{/snippet}
+						<Card
+							class={twMerge(
+								'rounded-b-none bg-primary-800 p-0 text-white dark:bg-primary-800',
+								'lg:rounded lg:bg-white lg:text-primary-700 dark:lg:bg-white'
+							)}
+						>
+							{#each adminNav as { href, Icon, label }}
+								<a class="flex items-center space-x-2 px-6 py-3" {href} title={label}>
+									<Icon />
+									<Div>
+										{label}
+									</Div>
+								</a>
+							{/each}
+						</Card>
+					</Popover>
+				{/if}
+				<NavItem Icon={LogOut} label="Sign Out" onclick={() => signOut()} tag="button" />
 			</Nav>
 		</Div>
 	</Header>

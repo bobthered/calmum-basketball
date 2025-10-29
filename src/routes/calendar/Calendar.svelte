@@ -101,9 +101,7 @@
 					class={twMerge(
 						'flex h-12 items-center justify-center rounded lg:aspect-square',
 						calendarDate.date.getMonth() !== date.getMonth() ? 'opacity-50' : undefined,
-						calendarDate.date.getDay() === 1 || calendarDate.date.getDay() === 5
-							? 'bg-primary-700 text-white'
-							: undefined
+						calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
 					)}
 				>
 					{calendarDate.date.getDate()}
