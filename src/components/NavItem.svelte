@@ -64,7 +64,7 @@
 		{...restProps}
 		bind:element={element as HTMLButtonElement | null}
 		class={twMerge(
-			'z-2 flex flex-col items-center rounded-none px-0 lg:rounded lg:bg-primary-200 lg:px-6 lg:text-primary-700 lg:hover:bg-primary-100',
+			'z-2 flex flex-col items-center rounded-none px-0 pb-[max(env(safe-area-inset-bottom),.75rem)] lg:rounded lg:bg-primary-200 lg:px-6 lg:pb-3 lg:text-primary-700 lg:hover:bg-primary-100',
 			className
 		)}
 	>
