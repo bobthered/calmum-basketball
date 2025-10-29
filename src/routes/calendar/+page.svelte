@@ -27,7 +27,7 @@
 	const calendarHeading = $derived.by(() => {
 		return date.toLocaleString('default', { month: 'long', year: '2-digit' });
 	});
-	const listDates = $derived.by(() =>
+	const listDatesMap = $derived.by(() =>
 		scheduledDates.value
 			.map((dateString) => {
 				const date = new Date(dateString);
@@ -36,7 +36,21 @@
 			})
 			.filter((date) => date.getTime() >= new Date().getTime())
 			.sort((a, b) => a.getTime() - b.getTime())
+			.reduce((map, date) => {
+				const key = `${date.getFullYear()}-${date.getMonth().toString().padStart(2, '0')}`;
+				if (!map.has(key)) {
+					const month = date.toLocaleString('default', { month: 'long' });
+					map.set(key, { dates: [], month });
+				}
+				const keyValue = map.get(key);
+				if (keyValue) {
+					keyValue.dates.push(date);
+					map.set(key, keyValue);
+				}
+				return map;
+			}, new Map<string, { dates: Date[]; month: string }>())
 	);
+	const listDates = $derived.by(() => [...listDatesMap].sort((a, b) => a[0].localeCompare(b[0])));
 
 	// $effects
 	$effect(() => {
@@ -163,9 +177,20 @@
 {/snippet}
 
 {#snippet listView()}
-	<Card class="overflow-auto lg:mr-auto lg:min-w-sm">
-		{#each listDates as listDate}
-			<Div>{listDate.toLocaleString('default', { month: 'long', day: 'numeric' })}</Div>
+	<Card class="space-y-6 overflow-auto lg:mr-auto lg:min-w-sm">
+		{#each listDates as [_, { dates, month }]}
+			<Div class="flex flex-col">
+				<Div class="text-lg font-semibold">{month}</Div>
+				{#each dates as listDate}
+					<Div
+						>{listDate.toLocaleString('default', {
+							month: 'long',
+							day: 'numeric',
+							weekday: 'long'
+						})}</Div
+					>
+				{/each}
+			</Div>
 		{/each}
 	</Card>
 {/snippet}
