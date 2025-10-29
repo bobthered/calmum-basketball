@@ -110,7 +110,7 @@
 						>
 							{#each adminNav as { href, Icon, label }}
 								<a class="flex items-center space-x-2 px-6 py-3" {href} title={label}>
-									<Icon />
+									<Icon class="lg:hidden" />
 									<Div>
 										{label}
 									</Div>

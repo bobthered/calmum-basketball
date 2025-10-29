@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { CheckboxInputHandle, Div, Input, Label } from '$components';
+	import { CheckboxInputHandle, Label } from '$components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { type HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
-	import RadioInputHandle from './RadioInputHandle.svelte';
 
 	type Props = Omit<HTMLAttributes<HTMLLabelElement>, 'class' | 'style'> & {
 		attachments?: Attachment[];
@@ -35,7 +34,7 @@
 	{#if inputSnippet}
 		{@render inputSnippet()}
 	{:else}
-		<input bind:checked class="sr-only" type="checkbox" />
+		<input bind:checked class="peer sr-only" type="checkbox" />
 	{/if}
 	{#if handleSnippet}
 		{@render handleSnippet()}

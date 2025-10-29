@@ -4,6 +4,7 @@
 	import { twMerge } from 'tailwind-merge';
 	import { Button, Card, Div } from '$components';
 	import { scheduledDates } from '$lib/scheduledDates';
+	import { updateCalendar } from '$lib/remote/update-calendar.remote';
 
 	type CalendarDate = {
 		date: Date;
@@ -15,9 +16,10 @@
 		children?: Snippet;
 		date: Date;
 		daySnippet?: Snippet<[CalendarDate]>;
+		isEditable?: boolean;
 	};
 
-	let { children, date = $bindable(new Date()), daySnippet }: Props = $props();
+	let { children, date = $bindable(new Date()), daySnippet, isEditable = false }: Props = $props();
 
 	// $state
 	let calendar: Calendar = $state([]);
@@ -72,23 +74,27 @@
 		{@render children()}
 	{:else}
 		<Div class="col-span-7 flex items-center justify-between">
-			<Button
-				class="px-3"
-				onclick={() => {
-					date = new Date(date.setMonth(date.getMonth() - 1));
-				}}
-			>
-				<ChevronLeft />
-			</Button>
+			<Div class="flex p-1">
+				<Button
+					class="px-2 py-2"
+					onclick={() => {
+						date = new Date(date.setMonth(date.getMonth() - 1));
+					}}
+				>
+					<ChevronLeft />
+				</Button>
+			</Div>
 			<Div>{calendarHeading}</Div>
-			<Button
-				class="px-3"
-				onclick={() => {
-					date = new Date(date.setMonth(date.getMonth() + 1));
-				}}
-			>
-				<ChevronRight />
-			</Button>
+			<Div class="flex p-1">
+				<Button
+					class="px-2 py-2"
+					onclick={() => {
+						date = new Date(date.setMonth(date.getMonth() + 1));
+					}}
+				>
+					<ChevronRight />
+				</Button>
+			</Div>
 		</Div>
 		{#each dayHeadings as dayHeading}
 			<Div class="py-3 text-center">{dayHeading}</Div>
@@ -97,14 +103,43 @@
 			{#if daySnippet}
 				{@render daySnippet(calendarDate)}
 			{:else}
-				<Div
-					class={twMerge(
-						'flex h-12 items-center justify-center rounded lg:aspect-square',
-						calendarDate.date.getMonth() !== date.getMonth() ? 'opacity-50' : undefined,
-						calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
-					)}
-				>
-					{calendarDate.date.getDate()}
+				<Div class="aspect-squre flex h-12 p-1">
+					{#if isEditable}
+						<Button
+							class={twMerge(
+								'flex h-10 w-full items-center justify-center rounded bg-transparent p-0 text-center text-current lg:aspect-square',
+								calendarDate.date.getMonth() !== date.getMonth()
+									? 'disabled:bg-transparent disabled:text-current disabled:opacity-50'
+									: undefined,
+								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
+							)}
+							disabled={calendarDate.date.getMonth() !== date.getMonth() ? true : undefined}
+							onclick={async () => {
+								calendarDate.isScheduled = !calendarDate.isScheduled;
+								if (calendarDate.isScheduled) scheduledDates.value.push(calendarDate.dateString);
+								if (!calendarDate.isScheduled)
+									scheduledDates.value = scheduledDates.value.filter(
+										(scheduledDate) => scheduledDate !== calendarDate.dateString
+									);
+								await updateCalendar({
+									date: calendarDate.dateString,
+									isScheduled: calendarDate.isScheduled
+								});
+							}}
+						>
+							{calendarDate.date.getDate()}
+						</Button>
+					{:else}
+						<Div
+							class={twMerge(
+								'flex h-10 w-full items-center justify-center rounded lg:aspect-square',
+								calendarDate.date.getMonth() !== date.getMonth() ? 'opacity-50' : undefined,
+								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
+							)}
+						>
+							{calendarDate.date.getDate()}
+						</Div>
+					{/if}
 				</Div>
 			{/if}
 		{/each}

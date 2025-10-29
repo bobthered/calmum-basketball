@@ -27,6 +27,7 @@
 	};
 
 	// $derives
+	const committed = $derived.by(() => rows.filter(({ status }) => status === 'Yes'));
 	const date = $derived.by(() => new Date());
 	const dateString = $derived.by(() => {
 		const formattedDate = date.toISOString().slice(0, 10);
@@ -42,6 +43,7 @@
 			.filter((date) => date.getTime() >= new Date().getTime())
 			.sort((a, b) => a.getTime() - b.getTime())
 	);
+	const maybies = $derived.by(() => rows.filter(({ status }) => status === 'Maybe'));
 	const nextBasketballDate = $derived.by(() => {
 		return new Date(listDates[0]);
 	});
@@ -57,7 +59,12 @@
 	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex items-center space-x-4">
 			<Div class="aspect-square w-6 rounded-full bg-green-500" />
-			<Div>Basketball is scheduled for tonight.</Div>
+			<Div
+				>Basketball is scheduled for tonight. We currently have {committed.length} committed{maybies.length !==
+				0
+					? ` and ${maybies.length} ${maybies.length == 1 ? 'maybe' : 'maybies'}`
+					: ''}.</Div
+			>
 		</Div>
 		<Div class="flex items-center space-x-4">
 			<Div>Will you be coming?</Div>
@@ -81,9 +88,9 @@
 				{/each}
 			</Div>
 		</Div>
-		<Card class="grid grid-cols-[auto_auto] overflow-hidden p-0 lg:mr-auto">
-			<Div class="bg-primary-700 px-6 py-3 text-white">Name</Div>
-			<Div class="bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
+		<Card class="relative grid grid-cols-[auto_auto] overflow-auto p-0 lg:mr-auto">
+			<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-white">Name</Div>
+			<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
 			{#if !isRowsPending}
 				{#if rows.length !== 0}
 					{#each rows as { _userId, status }, rowIndex}
@@ -112,12 +119,12 @@
 		</Card>
 	{:else}
 		<Div>No Basketball Scheduled For Today</Div>
-		<Div
-			>The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
+		<Div>
+			The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
 				month: 'long',
 				day: 'numeric',
 				weekday: 'long'
-			})}</Div
-		>
+			})}
+		</Div>
 	{/if}
 {/if}

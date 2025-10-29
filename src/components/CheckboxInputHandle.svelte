@@ -36,8 +36,10 @@
 >
 	<Div
 		class={twMerge(
-			'flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-white text-white shadow-sm outline-1 transition duration-200 dark:bg-gray-900',
-			checked ? 'bg-primary-700 dark:bg-primary-700' : 'outline-gray-950/10 dark:outline-gray-50/10'
+			'flex h-6 w-6 cursor-pointer items-center justify-center rounded bg-white text-white shadow-sm outline-1 outline-transparent transition duration-200 dark:bg-gray-900',
+			checked
+				? 'bg-primary-700 dark:bg-primary-700'
+				: 'outline-gray-950/10 peer-focus:outline-primary-700/30 hover:outline-gray-950/30 dark:outline-gray-50/10 dark:peer-focus:outline-primary-700/30 dark:hover:outline-gray-50/30'
 		)}
 	>
 		{#if checked}
