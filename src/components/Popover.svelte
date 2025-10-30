@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Div } from '$components';
+	import { clickOutside } from '$lib/attachments';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { quadInOut } from 'svelte/easing';
@@ -69,7 +70,15 @@
 
 <svelte:window bind:outerWidth />
 
-<Div {...restProps} bind:element class={twMerge('relative', className)} {style}>
+<Div
+	{...restProps}
+	{@attach clickOutside(async () => {
+		isOpen = false;
+	})}
+	bind:element
+	class={twMerge('relative', className)}
+	{style}
+>
 	{#if triggerSnippet}
 		{@render triggerSnippet()}
 	{/if}
