@@ -34,7 +34,7 @@
 		{...restProps}
 		bind:this={element}
 		class={twMerge(
-			'fixed top-0 left-0 flex h-svh w-svw flex-col overflow-auto bg-black/70 p-4 lg:h-lvh lg:w-lvw',
+			'fixed top-0 left-0 flex h-dvh w-dvw flex-col overflow-auto bg-black/70 p-4',
 			className
 		)}
 		{style}
