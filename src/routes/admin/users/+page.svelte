@@ -80,7 +80,9 @@
 	};
 	const updateUsers = async () => {
 		const result = await findUsers();
-		users = result;
+		users = result.sort((a: any, b: any) =>
+			`${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+		);
 	};
 
 	// $effects
