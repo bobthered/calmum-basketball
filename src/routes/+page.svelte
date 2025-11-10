@@ -33,6 +33,9 @@
 		const formattedDate = date.toISOString().slice(0, 10);
 		return formattedDate;
 	});
+	const isAnswered = $derived.by(
+		() => rows.filter(({ _userId: { _id } }) => _id === user?.value?._id).length === 1
+	);
 	const listDates = $derived.by(() =>
 		scheduledDates.value
 			.map((dateString) => {
@@ -52,6 +55,7 @@
 	$effect(() => {
 		if (isRowsPending) updateRows();
 	});
+	$inspect(rows, user.value);
 </script>
 
 {#if user.value}
@@ -59,72 +63,81 @@
 	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex items-center space-x-4">
 			<Div class="aspect-square w-6 rounded-full bg-green-500" />
+			<Div>Basketball is scheduled for tonight.</Div>
+		</Div>
+		{@render statusUpdate()}
+		{#if isAnswered}
 			<Div
-				>Basketball is scheduled for tonight. We currently have {committed.length} committed{maybies.length !==
-				0
+				>We currently have {committed.length} committed{maybies.length !== 0
 					? ` and ${maybies.length} ${maybies.length == 1 ? 'maybe' : 'maybies'}`
 					: ''}.</Div
 			>
-		</Div>
-		<Div class="flex items-center space-x-4">
-			<Div>Will you be coming?</Div>
-			<Div class="flex space-x-2">
-				{#each statuses as status}
-					<Button
-						onclick={async () => {
-							try {
-								if (!user.value) throw 'No User';
-								await updateUserCalendarStatus({
-									_userId: user.value._id,
-									date: dateString,
-									status
-								});
-								isRowsPending = true;
-							} catch (error) {}
-						}}
-					>
-						{status}
-					</Button>
-				{/each}
-			</Div>
-		</Div>
-		<Card class="relative grid grid-cols-[auto_auto] overflow-auto p-0 lg:mr-auto">
-			<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-white">Name</Div>
-			<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
-			{#if !isRowsPending}
-				{#if rows.length !== 0}
-					{#each rows as { _userId, status }, rowIndex}
-						<Div
-							class={twMerge(
-								'px-6 py-3',
-								rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined
-							)}>{_userId.firstName} {_userId.lastName}</Div
-						>
-						<Div
-							class={twMerge(
-								'px-6 py-3',
-								rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
-								'text-center'
-							)}>{status}</Div
-						>
-					{/each}
+			<Card class="relative grid grid-cols-[auto_auto] overflow-auto p-0 lg:mr-auto">
+				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-white">Name</Div>
+				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
+				{#if !isRowsPending}
+					{#if rows.length !== 0}
+						{#each rows as { _userId, status }, rowIndex}
+							<Div
+								class={twMerge(
+									'px-6 py-3',
+									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined
+								)}>{_userId.firstName} {_userId.lastName}</Div
+							>
+							<Div
+								class={twMerge(
+									'px-6 py-3',
+									rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
+									'text-center'
+								)}>{status}</Div
+							>
+						{/each}
+					{:else}
+						<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
+					{/if}
 				{:else}
-					<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
+					<Div class="col-span-2 px-6 py-3">
+						<Spinner />
+					</Div>
 				{/if}
-			{:else}
-				<Div class="col-span-2 px-6 py-3">
-					<Spinner />
-				</Div>
-			{/if}
-		</Card>
+			</Card>
+		{/if}
 	{:else}
-		<Div>No Basketball Scheduled For Today</Div>
-		<Div>
-			The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
-				month: 'long',
-				day: 'numeric',
-				weekday: 'long'
-			})}
-		</Div>
+		{@render noBasketball()}
 	{/if}
 {/if}
+
+{#snippet noBasketball()}
+	<Div>No Basketball Scheduled For Today</Div>
+	<Div>
+		The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
+			month: 'long',
+			day: 'numeric',
+			weekday: 'long'
+		})}
+	</Div>
+{/snippet}
+{#snippet statusUpdate()}
+	<Div class="flex items-center space-x-4">
+		<Div>Will you be coming?</Div>
+		<Div class="flex space-x-2">
+			{#each statuses as status}
+				<Button
+					onclick={async () => {
+						try {
+							if (!user.value) throw 'No User';
+							await updateUserCalendarStatus({
+								_userId: user.value._id,
+								date: dateString,
+								status
+							});
+							isRowsPending = true;
+						} catch (error) {}
+					}}
+				>
+					{status}
+				</Button>
+			{/each}
+		</Div>
+	</Div>
+{/snippet}
