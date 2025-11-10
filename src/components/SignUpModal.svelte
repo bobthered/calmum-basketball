@@ -51,6 +51,11 @@
 
 	const updateUser = async (_id: string) => {
 		const result = await findCurrentUser({ _id });
+		if (result.user === null) {
+			localStorage.removeItem('_id');
+			isOpen = true;
+			return;
+		}
 		user.value = {
 			_id: result.user._id,
 			firstName: result.user.firstName,
