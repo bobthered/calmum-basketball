@@ -107,11 +107,13 @@
 					{#if isEditable}
 						<Button
 							class={twMerge(
-								'flex h-10 w-full items-center justify-center rounded bg-transparent p-0 text-center text-current lg:aspect-square',
+								'flex h-10 w-full items-center justify-center rounded bg-transparent p-0 text-center text-current outline-1 -outline-offset-1 outline-black/10 focus:outline-primary-700 lg:aspect-square dark:outline-white/10 dark:focus:outline-primary-700',
 								calendarDate.date.getMonth() !== date.getMonth()
 									? 'disabled:bg-transparent disabled:text-current disabled:opacity-50'
 									: undefined,
-								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
+								calendarDate.isScheduled
+									? 'bg-primary-700 text-white focus:outline-primary-500 dark:focus:outline-primary-500'
+									: undefined
 							)}
 							disabled={calendarDate.date.getMonth() !== date.getMonth() ? true : undefined}
 							onclick={async () => {
@@ -132,9 +134,11 @@
 					{:else}
 						<Div
 							class={twMerge(
-								'flex h-10 w-full items-center justify-center rounded lg:aspect-square',
-								calendarDate.date.getMonth() !== date.getMonth() ? 'opacity-50' : undefined,
-								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined
+								'flex h-10 w-full items-center justify-center rounded outline-1 -outline-offset-1 outline-black/10 lg:aspect-square dark:outline-white/10',
+								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined,
+								calendarDate.date.getMonth() !== date.getMonth()
+									? 'bg-transparent opacity-50 outline-0'
+									: undefined
 							)}
 						>
 							{calendarDate.date.getDate()}
