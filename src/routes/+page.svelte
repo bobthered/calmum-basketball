@@ -39,8 +39,8 @@
 	const listDates = $derived.by(() =>
 		scheduledDates.value
 			.map((dateString) => {
-				const date = new Date(dateString);
-				date.setUTCHours(24);
+				const [year, month, day] = dateString.split('-').map(Number);
+				const date = new Date(year, month - 1, day);
 				return date;
 			})
 			.filter((date) => date.getTime() >= new Date().getTime())
