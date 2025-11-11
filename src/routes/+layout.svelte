@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
+	import { Bell, Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
@@ -25,6 +25,7 @@
 	// $state
 	let adminNav = $state([
 		{ href: '/admin/calendar', Icon: Calendar, label: 'Calendar' },
+		{ href: '/admin/notifications', Icon: Bell, label: 'Notifications' },
 		{ href: '/admin/users', Icon: Users, label: 'Users' }
 	]);
 	let isAdminPopoverOpen = $state(false);
