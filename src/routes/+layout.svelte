@@ -25,7 +25,6 @@
 	// $state
 	let adminNav = $state([
 		{ href: '/admin/calendar', Icon: Calendar, label: 'Calendar' },
-		{ href: '/admin/notifications', Icon: Bell, label: 'Notifications' },
 		{ href: '/admin/users', Icon: Users, label: 'Users' }
 	]);
 	let isAdminPopoverOpen = $state(false);
