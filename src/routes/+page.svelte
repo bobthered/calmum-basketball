@@ -11,7 +11,23 @@
 	let rows: any[] = $state([]);
 
 	// variables
-	const statuses = ['Yes', 'Maybe', 'No'];
+	const statuses = [
+		{
+			className:
+				'bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-green-500/30 dark:focus:outline-green-500/30 ',
+			status: 'Yes'
+		},
+		{
+			className:
+				'bg-amber-500 hover:bg-amber-600 focus:bg-amber-600 focus:outline-amber-500/30 dark:focus:outline-amber-500/30 ',
+			status: 'Maybe'
+		},
+		{
+			className:
+				'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:outline-red-500/30 dark:focus:outline-red-500/30 ',
+			status: 'No'
+		}
+	];
 	const updateRows = async () => {
 		try {
 			const result = await findUserCalendarStatus({ date: dateString });
@@ -27,15 +43,16 @@
 	};
 
 	// $derives
+	const answer = $derived.by(
+		() => (rows.filter(({ _userId: { _id } }) => _id === user?.value?._id) ?? [])[0]
+	);
 	const committed = $derived.by(() => rows.filter(({ status }) => status === 'Yes'));
 	const date = $derived.by(() => new Date());
 	const dateString = $derived.by(() => {
 		const formattedDate = date.toISOString().slice(0, 10);
 		return formattedDate;
 	});
-	const isAnswered = $derived.by(
-		() => rows.filter(({ _userId: { _id } }) => _id === user?.value?._id).length === 1
-	);
+	const isAnswered = $derived.by(() => answer !== undefined);
 	const listDates = $derived.by(() =>
 		scheduledDates.value
 			.map((dateString) => {
@@ -55,7 +72,6 @@
 	$effect(() => {
 		if (isRowsPending) updateRows();
 	});
-	$inspect(rows, user.value);
 </script>
 
 {#if user.value}
@@ -118,11 +134,17 @@
 	</Div>
 {/snippet}
 {#snippet statusUpdate()}
-	<Div class="flex items-center space-x-4">
+	<Div class="flex flex-col space-y-2">
 		<Div>Will you be coming?</Div>
 		<Div class="flex space-x-2">
-			{#each statuses as status}
+			{#each statuses as { className, status }}
 				<Button
+					class={twMerge(
+						className,
+						answer?.status !== status
+							? 'bg-gray-500 hover:bg-gray-600 focus:bg-gray-600 focus:outline-gray-500/30 dark:focus:outline-gray-500/30'
+							: undefined
+					)}
 					onclick={async () => {
 						try {
 							if (!user.value) throw 'No User';
