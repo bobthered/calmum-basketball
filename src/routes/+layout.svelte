@@ -51,7 +51,7 @@
 
 	// $effects
 	$effect(() => {
-		updateScheduledDates();
+		if (scheduledDates.value.length === 0) updateScheduledDates();
 	});
 </script>
 
