@@ -8,14 +8,15 @@ export const updateUserCalendarStatus = command(
 	v.object({
 		_userId: v.pipe(v.string(), v.nonEmpty()),
 		date: v.pipe(v.string(), v.nonEmpty()),
+		numberOfGuests: v.pipe(v.number()),
 		status: v.pipe(v.string(), v.nonEmpty())
 	}),
-	async ({ _userId, date, status }) => {
+	async ({ _userId, date, numberOfGuests, status }) => {
 		await connect();
 
 		await UserCalendarStatus.findOneAndUpdate(
 			{ _userId: new ObjectId(_userId), date },
-			{ date, status },
+			{ date, numberOfGuests, status },
 			{ upsert: true }
 		);
 
