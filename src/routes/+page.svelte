@@ -82,7 +82,6 @@
 		const formattedDate = date.toISOString().slice(0, 10);
 		return formattedDate;
 	});
-	const guestRows = $derived.by(() => [...rows].filter((row: any) => row.numberOfGuests > 0));
 	const isAnswered = $derived.by(() => answer !== undefined);
 	const listDates = $derived.by(() =>
 		scheduledDates.value
@@ -120,20 +119,24 @@
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
 	{#if scheduledDates.value.includes(dateString)}
-		<Div class="flex items-center space-x-4">
-			<Div class="aspect-square w-6 rounded-full bg-green-500" />
-			<Div>Basketball is scheduled for tonight.</Div>
-		</Div>
 		<Div class="flex space-x-4">
 			{@render statusUpdate()}
 			{@render guests()}
 		</Div>
 		{#if isAnswered}
-			<Div
-				>We currently have {committed} committed{maybies !== 0
-					? ` and ${maybies} ${maybies === 1 ? 'maybe' : 'maybies'}`
-					: ''}.</Div
+			<Card
+				class={twMerge(
+					'text-white dark:text-white',
+					committed + maybies / 2 >= 10
+						? 'bg-green-500 dark:bg-green-500'
+						: 'bg-red-500 dark:bg-red-500'
+				)}
 			>
+				We currently have {committed} committed{maybies !== 0
+					? ` and ${maybies} ${maybies === 1 ? 'maybe' : 'maybies'}`
+					: ''}.<br />
+				{#if committed + maybies / 2 >= 10}Game On!{:else}Need More!{/if}
+			</Card>
 			<Card class="relative grid grid-cols-[auto_auto] overflow-auto p-0 lg:mr-auto">
 				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-white">Name</Div>
 				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
