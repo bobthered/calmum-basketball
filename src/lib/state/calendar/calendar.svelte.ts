@@ -22,7 +22,7 @@ class Calendar {
 			this._lastOfPreviousMonth.getDate() - dayOfLastOfPreviousMonth
 		);
 
-		while (tempDate.getTime() < this._firstOfNextMonth.getTime()) {
+		for (let i = 0; i < 42; i++) {
 			const dateString = new Date(tempDate).toISOString().split('T')[0];
 			calendar.push({
 				date: new Date(tempDate),
