@@ -216,6 +216,11 @@
 			weekday: 'long'
 		})}
 	</Div>
+	{#if user?.value?.isAdmin}
+		<Div>
+			{(nextBasketballDate.getTime() - new Date().getTime()) / 1000 / 60 / 60 / 24}
+		</Div>
+	{/if}
 {/snippet}
 {#snippet rowSnippet({
 	name,
