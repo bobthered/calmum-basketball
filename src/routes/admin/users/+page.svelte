@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Trash, TriangleAlert } from '@lucide/svelte';
+	import type { Snippet } from 'svelte';
+	import { twMerge } from 'tailwind-merge';
 	import {
 		Button,
 		Card,
@@ -14,9 +17,6 @@
 	import { deleteUser } from '$lib/remote/delete-user.remote';
 	import { findUsers } from '$lib/remote/find-users.remote';
 	import { updateUserField } from '$lib/remote/update-user-field.remote';
-	import { Trash, TriangleAlert } from '@lucide/svelte';
-	import type { Snippet } from 'svelte';
-	import { twMerge } from 'tailwind-merge';
 
 	type BaseCell = {
 		class?: string;

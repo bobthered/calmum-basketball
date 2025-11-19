@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
 	import { Card, Div } from '$components';
-	import { scheduledDates } from '$lib/scheduledDates';
+	import { scheduledDates } from '$lib/state';
 
 	type Props = {
 		children?: Snippet;
-		date: Date;
 	};
 
-	let { children, date = $bindable(new Date()) }: Props = $props();
+	let { children }: Props = $props();
 
 	// $derives
 	const listDatesMap = $derived.by(() =>

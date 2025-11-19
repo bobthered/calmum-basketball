@@ -18,7 +18,7 @@
 	import { slide } from '$lib/transition';
 	import { findCurrentUser } from '$lib/remote/find-current-user.remote';
 	import { signUp } from '$lib/remote/sign-up.remote';
-	import { user } from '$lib/user';
+	import { user } from '$lib/state/user';
 	import { signIn } from '$lib/remote/sign-in.remote';
 
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {

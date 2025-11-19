@@ -13,7 +13,7 @@
 	} from '$components';
 	import { deleteUser } from '$lib/remote/delete-user.remote';
 	import { updateUser } from '$lib/remote/update-user.remote';
-	import { user } from '$lib/user';
+	import { user } from '$lib/state';
 
 	// $state
 	let isDeleteModalOpen = $state(false);

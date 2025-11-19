@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Bell, Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
+	import { Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
@@ -16,8 +16,7 @@
 	} from '$components';
 	import SignUpModal from '$components/SignUpModal.svelte';
 	import { findCalendar } from '$lib/remote/find-calendar.remote';
-	import { scheduledDates } from '$lib/scheduledDates';
-	import { user } from '$lib/user';
+	import { scheduledDates, user } from '$lib/state';
 	import '../app.css';
 
 	let { children } = $props();
@@ -51,7 +50,7 @@
 
 	// $effects
 	$effect(() => {
-		if (scheduledDates.value.length === 0) updateScheduledDates();
+		updateScheduledDates();
 	});
 </script>
 

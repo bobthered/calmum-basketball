@@ -20,7 +20,7 @@
 	</Div>
 </FormControl>
 {#if view === 'Month'}
-	<Calendar bind:date />
+	<Calendar />
 {:else if view === 'List'}
-	<List bind:date />
+	<List />
 {/if}
