@@ -158,10 +158,9 @@
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
 	{#if user.value.isAdmin}
-		<Div>dateString: {dateString}</Div>
-		<Div>
-			{timeRemaining.display}
-		</Div>
+		<pre>dateString: {dateString}
+scheduledDates.value.includes(dateString): {scheduledDates.value.includes(dateString)}
+{timeRemaining.display}</pre>
 	{/if}
 	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex space-x-4">
