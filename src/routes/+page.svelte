@@ -11,6 +11,7 @@
 	let isRowsPending = $state(true);
 	let numberOfGuests = $state(0);
 	let rows: any[] = $state([]);
+	let timestamp = $state(new Date().getTime());
 
 	// variables
 	const statuses = [
@@ -33,6 +34,10 @@
 			status: 'No'
 		}
 	];
+	const step = () => {
+		timestamp = new Date().getTime();
+		requestAnimationFrame(step);
+	};
 	const updateRows = async () => {
 		try {
 			const result = await findUserCalendarStatus({ date: dateString });
@@ -101,6 +106,38 @@
 	const nextBasketballDate = $derived.by(() => {
 		return new Date(listDates[0]);
 	});
+	const timeRemaining = $derived.by(() => {
+		let remainingMilliseconds = new Date(nextBasketballDate).getTime() - timestamp;
+
+		const days = Math.floor(remainingMilliseconds / 1000 / 60 / 60 / 24);
+		remainingMilliseconds -= days * 1000 * 60 * 60 * 24;
+
+		const hours = Math.floor(remainingMilliseconds / 1000 / 60 / 60);
+		remainingMilliseconds -= hours * 1000 * 60 * 60;
+
+		const minutes = Math.floor(remainingMilliseconds / 1000 / 60);
+		remainingMilliseconds -= minutes * 1000 * 60;
+
+		const seconds = Math.floor(remainingMilliseconds / 1000);
+		remainingMilliseconds -= seconds * 1000;
+
+		let array = [];
+
+		if (days > 0) array.push(`${days} day${days !== 1 ? 's' : ''}`);
+		if (hours > 0) array.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+		if (minutes > 0) array.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
+		if (seconds > 0) array.push(`${seconds} second${seconds !== 1 ? 's' : ''}`);
+
+		const display = array.join(', ');
+
+		return {
+			days,
+			hours,
+			minutes,
+			seconds,
+			display
+		};
+	});
 
 	// $effects
 	$effect(() => {
@@ -113,10 +150,19 @@
 			});
 		}
 	});
+	$effect(() => {
+		requestAnimationFrame(step);
+	});
 </script>
 
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
+	{#if user.value.isAdmin}
+		<Div>dateString: {dateString}</Div>
+		<Div>
+			{timeRemaining.display}
+		</Div>
+	{/if}
 	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex space-x-4">
 			{@render statusUpdate()}
@@ -216,11 +262,6 @@
 			weekday: 'long'
 		})}
 	</Div>
-	{#if user?.value?.isAdmin}
-		<Div>
-			{(nextBasketballDate.getTime() - new Date().getTime()) / 1000 / 60 / 60 / 24}
-		</Div>
-	{/if}
 {/snippet}
 {#snippet rowSnippet({
 	name,
