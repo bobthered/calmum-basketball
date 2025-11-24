@@ -83,7 +83,7 @@
 	);
 	const date = $derived.by(() => new Date());
 	const dateString = $derived.by(() => {
-		const formattedDate = date.toISOString().slice(0, 10);
+		const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 		return formattedDate;
 	});
 	const isAnswered = $derived.by(() => answer !== undefined);
@@ -157,11 +157,6 @@
 
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
-	{#if user.value.isAdmin}
-		<pre>dateString: {dateString}
-scheduledDates.value.includes(dateString): {scheduledDates.value.includes(dateString)}
-{timeRemaining.display}</pre>
-	{/if}
 	{#if scheduledDates.value.includes(dateString)}
 		<Div class="flex space-x-4">
 			{@render statusUpdate()}
