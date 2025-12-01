@@ -18,6 +18,7 @@ export { default as Modal } from './Modal.svelte';
 export { default as Nav } from './Nav.svelte';
 export { default as NavItem } from './NavItem.svelte';
 export { default as Popover } from './Popover.svelte';
+export { default as RadioGroup } from './RadioGroup.svelte';
 export { default as RadioInput } from './RadioInput.svelte';
 export { default as RadioInputHandle } from './RadioInputHandle.svelte';
 export { default as SignUpModal } from './SignUpModal.svelte';
