@@ -61,7 +61,7 @@
 				status: row.status
 			});
 			if (row.numberOfGuests > 0) {
-				for (let i = 0; i < numberOfGuests; i++) {
+				for (let i = 0; i < row.numberOfGuests; i++) {
 					allRows.push({
 						name: `${row._userId.firstName} ${row._userId.lastName} Guest ${i + 1}`,
 						status: 'Yes'
