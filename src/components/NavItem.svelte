@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { Button, Div } from '$components';
+	import { Button, Div } from '#components';
 	import { type Component, type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';

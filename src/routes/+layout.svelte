@@ -13,10 +13,10 @@
 		NavItem,
 		Popover,
 		Spinner
-	} from '$components';
-	import SignUpModal from '$components/SignUpModal.svelte';
-	import { findCalendar } from '$lib/remote/find-calendar.remote';
-	import { scheduledDates, user } from '$lib/state';
+	} from '#components';
+	import SignUpModal from '#components/SignUpModal.svelte';
+	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
+	import { scheduledDates, user } from '#lib/state/index.js';
 	import '../app.css';
 
 	let { children } = $props();

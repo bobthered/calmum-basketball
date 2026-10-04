@@ -16,6 +16,11 @@ npx sv create my-app
 
 ## Developing
 
+This project uses SvelteKit 3 and requires Node.js 22.17 or newer. Set
+`MONGODB_URL` and `MONGODB_DB` in `.env` before running the app. These variables
+are declared in `src/env.ts` and are read at build time; configure them in Vercel
+before building a deployment.
+
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```sh
@@ -35,4 +40,8 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+The app uses the Vercel adapter. Its remote-function packaging creates a symlink,
+so a local Windows build requires permission to create symlinks. Client and server
+compilation can succeed while the final packaging step fails with `EPERM`.
+
+Run `npm run check` and `npm run test:unit -- --run` to verify changes.

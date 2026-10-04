@@ -2,8 +2,8 @@ import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
 import * as v from 'valibot';
 import { form } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { User } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { User } from '#lib/mongoose/models/index.js';
 import { error } from '@sveltejs/kit';
 
 export const signIn = form(

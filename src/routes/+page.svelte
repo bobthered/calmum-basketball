@@ -2,10 +2,10 @@
 	import { Minus, Plus } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
-	import { Button, Card, Div, H1, Spinner } from '$components';
-	import { findUserCalendarStatus } from '$lib/remote/find-user-calendar-status.remote';
-	import { updateUserCalendarStatus } from '$lib/remote/update-user-calendar-status.remote';
-	import { scheduledDates, user } from '$lib/state';
+	import { Button, Card, Div, H1, Spinner } from '#components';
+	import { findUserCalendarStatus } from '#lib/remote/find-user-calendar-status.remote.js';
+	import { updateUserCalendarStatus } from '#lib/remote/update-user-calendar-status.remote.js';
+	import { scheduledDates, user } from '#lib/state/index.js';
 
 	// $state
 	let isRowsPending = $state(true);

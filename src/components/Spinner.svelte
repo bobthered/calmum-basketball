@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
 
 	type Props = Omit<HTMLAttributes<SVGElement>, 'class' | 'style'> & {

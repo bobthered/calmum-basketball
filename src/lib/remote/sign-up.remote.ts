@@ -2,8 +2,8 @@ import { error } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import * as v from 'valibot';
 import { form } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { User } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { User } from '#lib/mongoose/models/index.js';
 
 export const signUp = form(
 	v.object({

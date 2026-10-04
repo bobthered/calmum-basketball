@@ -1,6 +1,6 @@
 import { query } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { Calendar } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { Calendar } from '#lib/mongoose/models/index.js';
 
 export const findCalendar = query(async () => {
 	await connect();

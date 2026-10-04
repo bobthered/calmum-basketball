@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Card } from '$components';
-	import { fade } from '$lib/transition';
+	import { Card } from '#components';
+	import { fade } from '#lib/transition/index.js';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
 
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {

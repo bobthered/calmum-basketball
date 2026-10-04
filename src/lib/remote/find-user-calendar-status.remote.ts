@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { query } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { UserCalendarStatus } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { UserCalendarStatus } from '#lib/mongoose/models/index.js';
 
 export const findUserCalendarStatus = query(
 	v.object({

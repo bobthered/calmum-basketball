@@ -1,4 +1,4 @@
-import { scheduledDates } from '$lib/state/scheduledDates';
+import { scheduledDates } from '#lib/state/scheduledDates/index.js';
 
 class Calendar {
 	_currentDate = $state(new Date());

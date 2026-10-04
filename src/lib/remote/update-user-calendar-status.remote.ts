@@ -1,8 +1,8 @@
 import { ObjectId } from 'mongodb';
 import * as v from 'valibot';
 import { command } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { UserCalendarStatus } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { UserCalendarStatus } from '#lib/mongoose/models/index.js';
 
 export const updateUserCalendarStatus = command(
 	v.object({

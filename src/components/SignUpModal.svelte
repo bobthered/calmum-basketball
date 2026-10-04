@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { untrack, type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
-	import { browser } from '$app/environment';
+	import type { HTMLAttributes } from 'svelte/elements';
+	import { browser } from '$app/env';
 	import {
 		BasketballIcon,
 		Button,
@@ -14,12 +14,12 @@
 		Input,
 		Modal,
 		SubmitButton
-	} from '$components';
-	import { slide } from '$lib/transition';
-	import { findCurrentUser } from '$lib/remote/find-current-user.remote';
-	import { signUp } from '$lib/remote/sign-up.remote';
-	import { user } from '$lib/state/user';
-	import { signIn } from '$lib/remote/sign-in.remote';
+	} from '#components';
+	import { slide } from '#lib/transition/index.js';
+	import { findCurrentUser } from '#lib/remote/find-current-user.remote.js';
+	import { signUp } from '#lib/remote/sign-up.remote.js';
+	import { user } from '#lib/state/user/index.js';
+	import { signIn } from '#lib/remote/sign-in.remote.js';
 
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {
 		attachments?: Attachment[];
@@ -133,17 +133,17 @@
 		<Div class="flex flex-col space-y-4 overflow-auto p-4">
 			<FormControl label="Username">
 				<Input
+					{...signIn.fields.username.as('text')}
 					bind:value={username}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="username"
 					required={true}
 				/>
 			</FormControl>
 			<FormControl label="Password">
 				<Input
+					{...signIn.fields.password.as('password')}
 					bind:value={password}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="password"
 					required={true}
 					type="password"
 				/>
@@ -202,25 +202,25 @@
 		<Div class="flex flex-col space-y-4 overflow-auto p-4">
 			<FormControl label="First Name">
 				<Input
+					{...signUp.fields.firstName.as('text')}
 					bind:value={firstName}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="firstName"
 					required={true}
 				/>
 			</FormControl>
 			<FormControl label="Last Name">
 				<Input
+					{...signUp.fields.lastName.as('text')}
 					bind:value={lastName}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="lastName"
 					required={true}
 				/>
 			</FormControl>
 			<FormControl label="Username">
 				<Input
+					{...signUp.fields.username.as('text')}
 					bind:value={username}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="username"
 					readonly={true}
 					required={true}
 					tabindex={-1}
@@ -228,9 +228,9 @@
 			</FormControl>
 			<FormControl label="Password">
 				<Input
+					{...signUp.fields.password.as('password')}
 					bind:value={password}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="password"
 					required={true}
 					type="password"
 				/>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { H1 } from '$components';
+	import { H1 } from '#components';
 	import Calendar from '../../calendar/Calendar.svelte';
 </script>
 

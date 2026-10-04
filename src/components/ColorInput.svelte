@@ -3,7 +3,7 @@
 	import Pipette from '@lucide/svelte/icons/pipette';
 	// @ts-ignore
 	import isDarkColor from 'is-dark-color';
-	import { Button, Div, Input } from '$components';
+	import { Button, Div, Input } from '#components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';

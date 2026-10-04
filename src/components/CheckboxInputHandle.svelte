@@ -2,9 +2,9 @@
 	import Check from '@lucide/svelte/icons/check';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
-	import { Div } from '$components';
+	import { Div } from '#components';
 	import { scale } from 'svelte/transition';
 
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {

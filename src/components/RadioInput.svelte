@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Div, Input, Label } from '$components';
+	import { Div, Input, Label } from '#components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
-	import { type HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
 	import RadioInputHandle from './RadioInputHandle.svelte';
 

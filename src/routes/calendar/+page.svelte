@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FormControl, H1, RadioGroup, RadioInput } from '$components';
+	import { FormControl, H1, RadioGroup, RadioInput } from '#components';
 	import Calendar from './Calendar.svelte';
 	import List from './List.svelte';
 

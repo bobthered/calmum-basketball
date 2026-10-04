@@ -2,11 +2,11 @@
 	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
 	import { type Snippet } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
-	import { Button, Card, Div, Spinner } from '$components';
-	import { findCalendar } from '$lib/remote/find-calendar.remote';
-	import { updateCalendar } from '$lib/remote/update-calendar.remote';
-	import { calendar, scheduledDates } from '$lib/state';
-	import { fade } from '$lib/transition';
+	import { Button, Card, Div, Spinner } from '#components';
+	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
+	import { updateCalendar } from '#lib/remote/update-calendar.remote.js';
+	import { calendar, scheduledDates } from '#lib/state/index.js';
+	import { fade } from '#lib/transition/index.js';
 
 	type CalendarDate = {
 		date: Date;

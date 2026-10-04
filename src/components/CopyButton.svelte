@@ -3,8 +3,8 @@
 	import { type Snippet } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import { twMerge } from 'tailwind-merge';
-	import { Button, Div } from '$components';
-	import { copyToClipboard } from '$lib/copyToClipboard';
+	import { Button, Div } from '#components';
+	import { copyToClipboard } from '#lib/copyToClipboard.js';
 
 	type Props = {
 		children?: Snippet;

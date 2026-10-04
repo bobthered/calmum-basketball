@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
-	import { Card, Div } from '$components';
-	import { scheduledDates } from '$lib/state';
+	import { Card, Div } from '#components';
+	import { scheduledDates } from '#lib/state/index.js';
 
 	type Props = {
 		children?: Snippet;

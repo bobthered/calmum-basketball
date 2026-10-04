@@ -10,10 +10,10 @@
 		Input,
 		Modal,
 		SubmitButton
-	} from '$components';
-	import { deleteUser } from '$lib/remote/delete-user.remote';
-	import { updateUser } from '$lib/remote/update-user.remote';
-	import { user } from '$lib/state';
+	} from '#components';
+	import { deleteUser } from '#lib/remote/delete-user.remote.js';
+	import { updateUser } from '#lib/remote/update-user.remote.js';
+	import { user } from '#lib/state/index.js';
 
 	// $state
 	let isDeleteModalOpen = $state(false);
@@ -44,20 +44,24 @@
 				} catch (error) {}
 			})}
 		>
-			<Input class="sr-only" name="_id" value={tempUser._id} />
+			<Input
+				{...updateUser.fields._id.as('hidden', tempUser._id)}
+				class="sr-only"
+				value={tempUser._id}
+			/>
 			<FormControl label="First Name">
 				<Input
+					{...updateUser.fields.firstName.as('text')}
 					bind:value={tempUser.firstName}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="firstName"
 					required={true}
 				/>
 			</FormControl>
 			<FormControl label="Last Name">
 				<Input
+					{...updateUser.fields.lastName.as('text')}
 					bind:value={tempUser.lastName}
 					class="bg-gray-50 dark:bg-gray-950"
-					name="lastName"
 					required={true}
 				/>
 			</FormControl>
@@ -85,7 +89,12 @@
 					} catch (error) {}
 				})}
 			>
-				<Input class="sr-only" name="_id" value={user?.value?._id} type="hidden" />
+				<Input
+					{...deleteUser.fields._id.as('hidden', user?.value?._id ?? '')}
+					class="sr-only"
+					value={user?.value?._id}
+					type="hidden"
+				/>
 				<SubmitButton bind:isPending class="bg-red-500">Delete</SubmitButton>
 			</Form>
 		</Div>

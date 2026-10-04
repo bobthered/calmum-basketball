@@ -13,10 +13,10 @@
 		Modal,
 		Spinner,
 		SubmitButton
-	} from '$components';
-	import { deleteUser } from '$lib/remote/delete-user.remote';
-	import { findUsers } from '$lib/remote/find-users.remote';
-	import { updateUserField } from '$lib/remote/update-user-field.remote';
+	} from '#components';
+	import { deleteUser } from '#lib/remote/delete-user.remote.js';
+	import { findUsers } from '#lib/remote/find-users.remote.js';
+	import { updateUserField } from '#lib/remote/update-user-field.remote.js';
 
 	type BaseCell = {
 		class?: string;
@@ -131,7 +131,12 @@
 						} catch (error) {}
 					})}
 				>
-					<Input bind:value={deleteModal.user._id} class="sr-only" name="_id" type="hidden" />
+					<Input
+						{...deleteUser.fields._id.as('hidden', deleteModal.user._id)}
+						bind:value={deleteModal.user._id}
+						class="sr-only"
+						type="hidden"
+					/>
 					<TriangleAlert class="text-red-500" size={80} />
 					<Div>
 						Are you sure you want to delete username "{deleteModal.user.username}"? This cannot be

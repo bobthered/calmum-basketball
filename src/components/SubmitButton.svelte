@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Div, Spinner } from '$components';
+	import { Button, Div, Spinner } from '#components';
 	import { type Snippet } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
 

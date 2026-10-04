@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Div } from '$components';
-	import { clickOutside } from '$lib/attachments';
+	import { Div } from '#components';
+	import { clickOutside } from '#lib/attachments/index.js';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { quadInOut } from 'svelte/easing';

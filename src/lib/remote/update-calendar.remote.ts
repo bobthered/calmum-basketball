@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { command } from '$app/server';
-import { connect } from '$lib/mongoose/connect';
-import { Calendar } from '$lib/mongoose/models';
+import { connect } from '#lib/mongoose/connect.js';
+import { Calendar } from '#lib/mongoose/models/index.js';
 
 export const updateCalendar = command(
 	v.object({

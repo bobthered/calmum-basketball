@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { MONGODB_DB, MONGODB_URL } from '$env/static/private';
+import { MONGODB_DB, MONGODB_URL } from '$app/env/private';
 
 type Options = {
 	appName?: string;

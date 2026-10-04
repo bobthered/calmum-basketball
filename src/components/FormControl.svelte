@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Div, Label } from '$components';
+	import { Div, Label } from '#components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';
