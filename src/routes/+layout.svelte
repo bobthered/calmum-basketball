@@ -96,13 +96,19 @@
 	<link rel="alternate icon" href="/icons/icon-16x16.png" />
 	<link rel="apple-touch-icon" href="/icons/icon-apple-touch.png" />
 	<link rel="manifest" href="/manifest.json" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="theme-color" content="#6a1931" />
+	<meta
+		name="viewport"
+		content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover"
+	/>
 	<title>Cal-Mum Rec. Basketball</title>
 </svelte:head>
 
 <Main
 	class={twMerge(
-		'flex min-h-0 flex-1 flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]',
+		'flex grow flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]',
 		page.url.pathname.startsWith('/settings') ? 'p-0 pt-0 lg:p-4' : ''
 	)}
 >
@@ -112,7 +118,7 @@
 	{/if}
 </Main>
 {#if user.value !== null}
-	<Header class="relative z-2 shrink-0 bg-primary-700 text-white">
+	<Header class="relative z-2 bg-primary-700 text-white">
 		<Div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 lg:px-4">
 			<Div class="hidden min-w-0 items-center gap-4 lg:flex">
 				<BasketballIcon class="h-16 w-16 shrink-0" />
