@@ -3,7 +3,7 @@
 	import { twMerge } from 'tailwind-merge';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
-	import { syncPwaViewport } from '#lib/ui/pwa-viewport.js';
+	import { startDisplayDiagnostics } from '#lib/ui/display-diagnostics.js';
 	import { isActiveRoute } from '#lib/ui/navigation.js';
 	import {
 		BasketballIcon,
@@ -27,10 +27,7 @@
 	import '../app.css';
 
 	let { children } = $props();
-	onMount(() => {
-		const shell = document.getElementById('app-shell');
-		if (shell) return syncPwaViewport(shell);
-	});
+	onMount(startDisplayDiagnostics);
 
 	// $state
 
@@ -102,13 +99,7 @@
 	<link rel="alternate icon" href="/icons/icon-16x16.png" />
 	<link rel="apple-touch-icon" href="/icons/icon-apple-touch.png" />
 	<link rel="manifest" href="/manifest.json" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<meta name="mobile-web-app-capable" content="yes" />
 	<meta name="theme-color" content="#6a1931" />
-	<meta
-		name="viewport"
-		content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover"
-	/>
 	<title>Cal-Mum Rec. Basketball</title>
 </svelte:head>
 
