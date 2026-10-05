@@ -2,6 +2,8 @@
 	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { page } from '$app/state';
+	import { onMount } from 'svelte';
+	import { syncPwaViewport } from '#lib/ui/pwa-viewport.js';
 	import { isActiveRoute } from '#lib/ui/navigation.js';
 	import {
 		BasketballIcon,
@@ -25,6 +27,10 @@
 	import '../app.css';
 
 	let { children } = $props();
+	onMount(() => {
+		const shell = document.getElementById('app-shell');
+		if (shell) return syncPwaViewport(shell);
+	});
 
 	// $state
 
