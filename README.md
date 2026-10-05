@@ -14,7 +14,7 @@ application data through Mongoose, and Vercel hosts the app.
 Shared UI primitives come from `sveltewind/components`, re-exported through
 `src/components/index.ts`. The app's central theme in `src/lib/ui/theme.ts`
 extends SvelteWind's Classic preset. `src/app.css` includes SvelteWind's Tailwind
-sources and preserves the custom burgundy and gray palettes.
+sources and preserves the custom maroon and gray palettes.
 
 App-specific components compose these primitives: mobile navigation, labeled
 form fields, pending submit buttons, and the login and notification flows.

@@ -84,7 +84,7 @@
 		{/snippet}
 	</WindCalendar>
 	<p class="text-sm text-gray-600 dark:text-gray-400">
-		Burgundy dates have basketball scheduled.{#if isEditable}
+		Maroon dates have basketball scheduled.{#if isEditable}
 			Click a date to add or remove basketball.{/if}
 	</p>
 	{#if isLoading}<p role="status" class="text-sm">Loading schedule...</p>{/if}

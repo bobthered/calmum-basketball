@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { Minus, Plus } from '@lucide/svelte';
-	import { untrack } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
-	import { Button, Card, Div, H1, Spinner } from '#components';
+	import { Button, Card, Div, H1, Spinner, Toast, Toaster } from '#components';
+	import { subtleReveal } from 'sveltewind/transitions';
+	import type { ToastItem } from 'sveltewind/components';
 	import { findUserCalendarStatus } from '#lib/remote/find-user-calendar-status.remote.js';
 	import { updateUserCalendarStatus } from '#lib/remote/update-user-calendar-status.remote.js';
 	import { scheduledDates, user } from '#lib/state/index.js';
 
 	// $state
 	let isRowsPending = $state(true);
-	let numberOfGuests = $state(0);
+	let isAttendancePending = $state(false);
+	let toasts: ToastItem[] = $state([]);
 	let rows: any[] = $state([]);
 	let timestamp = $state(new Date().getTime());
 
@@ -40,7 +42,9 @@
 	};
 	const updateRows = async () => {
 		try {
-			const result = await findUserCalendarStatus({ date: dateString });
+			const query = findUserCalendarStatus({ date: dateString });
+			await query.refresh();
+			const result = await query;
 			if (result.success) {
 				rows = result.rows.sort((a: any, b: any) =>
 					`${a._userId.firstName} ${b._userId.lastName}`.localeCompare(
@@ -75,6 +79,42 @@
 	const answer = $derived.by(
 		() => (rows.filter(({ _userId: { _id } }) => _id === user?.value?._id) ?? [])[0]
 	);
+	const numberOfGuests = $derived(answer?.numberOfGuests ?? 0);
+	async function saveAttendance(status: string, guests: number) {
+		if (!user.value || isRowsPending || isAttendancePending || guests < 0) return;
+		isAttendancePending = true;
+		toasts = [{ id: 'attendance', message: 'Saving attendance...', status: 'info', duration: 0 }];
+		const previousRows = $state.snapshot(rows);
+		const account = $state.snapshot(user.value);
+		const nextAnswer = { ...answer, _userId: account, status, numberOfGuests: guests };
+		rows = answer
+			? rows.map((row) => (row._userId._id === account._id ? nextAnswer : row))
+			: [...rows, nextAnswer];
+		try {
+			const result = await updateUserCalendarStatus({
+				_userId: account._id,
+				date: dateString,
+				numberOfGuests: guests,
+				status
+			});
+			if (!result.success) throw new Error('Save failed');
+			toasts = [
+				{ id: 'attendance', message: 'Attendance saved.', status: 'success', duration: 2500 }
+			];
+		} catch {
+			rows = previousRows;
+			toasts = [
+				{
+					id: 'attendance',
+					message: 'Could not save your attendance or guests. Please try again.',
+					status: 'error',
+					duration: 0
+				}
+			];
+		} finally {
+			isAttendancePending = false;
+		}
+	}
 	const committed = $derived.by(() =>
 		allRows.reduce((total, { status }) => {
 			if (status === 'Yes') total++;
@@ -144,17 +184,25 @@
 		if (isRowsPending) updateRows();
 	});
 	$effect(() => {
-		if (isAnswered) {
-			untrack(() => {
-				numberOfGuests = answer.numberOfGuests;
-			});
-		}
-	});
-	$effect(() => {
 		requestAnimationFrame(step);
 	});
 </script>
 
+<Toaster
+	position="top-right"
+	class="top-[calc(env(safe-area-inset-top)+1rem)]"
+	aria-label="Attendance notifications"
+>
+	{#each toasts as toast (toast.id)}
+		<Toast
+			{...toast}
+			transition={[subtleReveal, { duration: 200 }]}
+			onDismiss={() => {
+				toasts = toasts.filter((item) => item.id !== toast.id);
+			}}
+		/>
+	{/each}
+</Toaster>
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
 	{#if scheduledDates.value.includes(dateString)}
@@ -208,43 +256,27 @@
 		<Div>Guests - {numberOfGuests}</Div>
 		<Div class="flex space-x-2">
 			<Button
+				type="button"
+				aria-label="Add guest"
 				class="flex aspect-square h-12 items-center justify-center p-0"
-				onclick={async () => {
-					try {
-						if (!user.value) throw 'No User';
-						numberOfGuests++;
-						await updateUserCalendarStatus({
-							_userId: user.value._id,
-							date: dateString,
-							numberOfGuests,
-							status: answer.status
-						});
-						isRowsPending = true;
-					} catch (error) {}
-				}}
+				disabled={isRowsPending || isAttendancePending || !isAnswered}
+				onclick={() => saveAttendance(answer.status, numberOfGuests + 1)}
 			>
 				<Plus />
 			</Button>
 			<Button
+				type="button"
+				aria-label="Remove guest"
 				class="flex aspect-square h-12 items-center justify-center p-0"
-				disabled={numberOfGuests < 1 ? true : undefined}
-				onclick={async () => {
-					try {
-						if (!user.value) throw 'No User';
-						numberOfGuests--;
-						await updateUserCalendarStatus({
-							_userId: user.value._id,
-							date: dateString,
-							numberOfGuests,
-							status: answer.status
-						});
-						isRowsPending = true;
-					} catch (error) {}
-				}}
+				disabled={isRowsPending || isAttendancePending || !isAnswered || numberOfGuests < 1}
+				onclick={() => saveAttendance(answer.status, numberOfGuests - 1)}
 			>
 				<Minus />
 			</Button>
 		</Div>
+		{#if !isRowsPending && !isAnswered}<p class="text-sm text-gray-600 dark:text-gray-400">
+				Select your attendance before adding guests.
+			</p>{/if}
 	</Div>
 {/snippet}
 {#snippet noBasketball()}
@@ -287,24 +319,15 @@
 		<Div class="flex space-x-2">
 			{#each statuses as { className, emoji, status }}
 				<Button
+					type="button"
+					disabled={isRowsPending || isAttendancePending}
 					class={twMerge(
 						className,
 						answer?.status !== status
 							? 'bg-gray-500 hover:bg-gray-600 focus:bg-gray-600 focus:outline-gray-500/30 dark:focus:outline-gray-500/30'
 							: undefined
 					)}
-					onclick={async () => {
-						try {
-							if (!user.value) throw 'No User';
-							await updateUserCalendarStatus({
-								_userId: user.value._id,
-								date: dateString,
-								numberOfGuests,
-								status
-							});
-							isRowsPending = true;
-						} catch (error) {}
-					}}
+					onclick={() => saveAttendance(status, numberOfGuests)}
 				>
 					{status}
 				</Button>

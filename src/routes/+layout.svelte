@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, Users, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
+	import { page } from '$app/state';
 	import {
 		BasketballIcon,
 		A,
@@ -100,7 +101,10 @@
 </svelte:head>
 
 <Main
-	class="flex grow flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
+	class={twMerge(
+		'flex grow flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]',
+		page.url.pathname.startsWith('/settings') ? 'p-0 pt-0 lg:p-4' : ''
+	)}
 >
 	{#if user.value !== null}
 		{#if calendarError}<p role="alert" class="text-red-600">{calendarError}</p>{/if}

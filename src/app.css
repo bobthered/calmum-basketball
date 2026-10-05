@@ -2,7 +2,71 @@
 @import 'sveltewind/themes/palettes.css';
 @source '../node_modules/sveltewind/dist';
 
-/* SvelteWind contrast tokens for the app's custom burgundy palette. */
+/* Only Settings navigations opt into these mobile page transitions. */
+@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
+	html[data-settings-direction]::view-transition-old(root),
+	html[data-settings-direction]::view-transition-new(root) {
+		animation: none;
+	}
+	html[data-settings-direction]::view-transition-group(settings-page) {
+		animation-duration: 240ms;
+	}
+	html[data-settings-direction]::view-transition-old(settings-page),
+	html[data-settings-direction]::view-transition-new(settings-page) {
+		mix-blend-mode: normal;
+		animation-duration: 240ms;
+		animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+		animation-fill-mode: both;
+	}
+	html[data-settings-direction='forward']::view-transition-old(settings-page) {
+		animation-name: settings-retreat;
+	}
+	html[data-settings-direction='forward']::view-transition-new(settings-page) {
+		animation-name: settings-enter;
+	}
+	html[data-settings-direction='back']::view-transition-old(settings-page) {
+		animation-name: settings-exit;
+		z-index: 2;
+	}
+	html[data-settings-direction='back']::view-transition-new(settings-page) {
+		animation-name: settings-return;
+		z-index: 1;
+	}
+}
+@keyframes settings-enter {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+@keyframes settings-exit {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
+@keyframes settings-retreat {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(-20%);
+	}
+}
+@keyframes settings-return {
+	from {
+		transform: translateX(-20%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+/* SvelteWind contrast tokens for the app's custom maroon palette. */
 :root {
 	--primary-foreground-50: var(--color-gray-950);
 	--primary-foreground-100: var(--color-gray-950);

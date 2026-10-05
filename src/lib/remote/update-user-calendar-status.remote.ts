@@ -9,7 +9,7 @@ export const updateUserCalendarStatus = command(
 	v.object({
 		_userId: v.pipe(v.string(), v.nonEmpty()),
 		date: v.pipe(v.string(), v.nonEmpty()),
-		numberOfGuests: v.pipe(v.number()),
+		numberOfGuests: v.pipe(v.number(), v.integer(), v.minValue(0)),
 		status: v.pipe(v.string(), v.nonEmpty())
 	}),
 	async ({ _userId, date, numberOfGuests, status }) => {

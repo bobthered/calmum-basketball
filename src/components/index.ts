@@ -21,7 +21,9 @@ export {
 	Radio,
 	Spinner,
 	Tabs,
-	Textarea
+	Textarea,
+	Toast,
+	Toaster
 } from 'sveltewind/components';
 export { default as FormControl } from './FormControl.svelte';
 export { default as Modal } from './Modal.svelte';
