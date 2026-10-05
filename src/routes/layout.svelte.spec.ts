@@ -133,3 +133,31 @@ it('toggles the sliding desktop menu in place and closes it on outside clicks', 
 		.element(page.getByRole('navigation', { name: 'Desktop navigation' }))
 		.not.toBeInTheDocument();
 });
+
+it('keeps the mobile app bar at the bottom while long content scrolls inside the shell', async () => {
+	await page.viewport(390, 844);
+	user.value = account;
+	render(Layout);
+	const main = document.querySelector('main')!;
+	const header = document.querySelector('header')!;
+	const shell = document.createElement('div');
+	shell.className = 'app-shell flex flex-col';
+	shell.append(main, header);
+	document.body.append(shell);
+	try {
+		const content = document.createElement('div');
+		content.style.minHeight = '1600px';
+		main.append(content);
+		for (const height of [844, 700]) {
+			await page.viewport(390, height);
+			await vi.waitFor(() => {
+				expect(shell.getBoundingClientRect().height).toBe(height);
+				expect(header.getBoundingClientRect().bottom).toBe(height);
+			});
+			expect(main.scrollHeight).toBeGreaterThan(main.clientHeight);
+			expect(getComputedStyle(header).flexShrink).toBe('0');
+		}
+	} finally {
+		shell.remove();
+	}
+});
