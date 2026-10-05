@@ -117,7 +117,7 @@
 			</p>
 			<p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
 				Notifications are optional and apply to this device. You can change your choice anytime in
-				My Account.
+				Settings.
 			</p>
 			{#if message}<p role="alert" class="mt-3 text-sm text-red-600 dark:text-red-400">
 					{message}
@@ -125,18 +125,18 @@
 			<div class="mt-6 flex flex-wrap justify-end gap-3">
 				<Button disabled={busy} onclick={() => answer('later')}>Not now</Button>
 				<Button disabled={busy} onclick={toggle} class="bg-primary-700 text-white"
-					>{busy ? 'Enablingâ€¦' : 'Enable notifications'}</Button
+					>{busy ? 'Enabling...' : 'Enable notifications'}</Button
 				>
 			</div>
 		</Modal>
 	{/if}
 {:else}
-	<Card class="flex flex-col gap-3 lg:mr-auto">
+	<Card class="flex w-full flex-col gap-3">
 		<h2 class="text-xl font-semibold">Notifications</h2>
 		<p class="text-sm">
 			Get an alert on this device when another player posts a message, even when the app is closed.
 		</p>
-		{#if !ready}<p role="status">Checking notification settingsâ€¦</p>
+		{#if !ready}<p role="status">Checking notification settings...</p>
 		{:else if installNeeded}<p class="text-sm">
 				On iPhone or iPad, add this app to your Home Screen and open it there to enable
 				notifications.
@@ -155,7 +155,7 @@
 			</p>
 			<Button class="self-start bg-primary-700 text-white" disabled={busy} onclick={toggle}
 				>{busy
-					? 'Updatingâ€¦'
+					? 'Updating...'
 					: enabled
 						? 'Turn off notifications'
 						: 'Enable notifications'}</Button

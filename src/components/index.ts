@@ -4,6 +4,7 @@ export {
 	A,
 	Button,
 	Card,
+	Calendar,
 	Checkbox,
 	Dialog,
 	Div,
@@ -19,6 +20,7 @@ export {
 	Popover,
 	Radio,
 	Spinner,
+	Tabs,
 	Textarea
 } from 'sveltewind/components';
 export { default as FormControl } from './FormControl.svelte';

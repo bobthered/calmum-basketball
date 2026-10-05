@@ -10,6 +10,7 @@
 		class?: string;
 		element?: null;
 		label?: string;
+		for?: string;
 		labelSnippet?: Snippet;
 		style?: string;
 		variants?: string[];
@@ -20,6 +21,7 @@
 		class: className,
 		element = $bindable(null),
 		label,
+		for: htmlFor,
 		labelSnippet,
 		style,
 		variants = [],
@@ -31,7 +33,7 @@
 	{#if labelSnippet}
 		{@render labelSnippet()}
 	{:else if label}
-		<Label>{label}</Label>
+		<Label for={htmlFor}>{label}</Label>
 	{/if}
 	{#if children}
 		{@render children()}

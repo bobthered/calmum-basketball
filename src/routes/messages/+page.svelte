@@ -112,7 +112,7 @@
 	<div class="flex flex-wrap items-center justify-between gap-2">
 		<H1>Basketball Chat</H1>
 		<span class="text-sm text-gray-600 dark:text-gray-400" role="status">
-			{live.connected ? 'Live' : 'Reconnectingâ€¦'}
+			{live.connected ? 'Live' : 'Reconnecting...'}
 		</span>
 	</div>
 	<p class="text-sm text-gray-600 dark:text-gray-400">
@@ -130,10 +130,10 @@
 		aria-label="Group messages"
 	>
 		{#if hasMore}<Button class="mx-auto block" disabled={loadingOlder} onclick={loadOlder}
-				>{loadingOlder ? 'Loadingâ€¦' : 'Load older messages'}</Button
+				>{loadingOlder ? 'Loading...' : 'Load older messages'}</Button
 			>{/if}
 		{#if historyError}<p role="alert" class="text-red-600 dark:text-red-400">{historyError}</p>{/if}
-		{#if !initialized}<p role="status">Loading messagesâ€¦</p>
+		{#if !initialized}<p role="status">Loading messages...</p>
 		{:else if messages.length === 0}<p class="py-6 text-center text-gray-500">
 				No messages yet. Start the conversation!
 			</p>{/if}
@@ -166,13 +166,13 @@
 			rows={2}
 			maxlength={2000}
 			disabled={sending}
-			placeholder="Message the groupâ€¦"
+			placeholder="Message the group"
 			class="w-full resize-none rounded-lg border border-gray-300 bg-white p-3 focus:outline-primary-700 dark:border-gray-700 dark:bg-gray-900"
 		></Textarea>
 		<div class="flex items-center justify-between gap-3">
 			<span class="text-xs text-gray-500">{text.length}/2000</span>
 			<Button type="submit" class="bg-primary-700 text-white" disabled={sending || !text.trim()}
-				>{sending ? 'Sendingâ€¦' : 'Send'}</Button
+				>{sending ? 'Sending...' : 'Send'}</Button
 			>
 		</div>
 		{#if sendError}<p role="alert" class="text-sm text-red-600 dark:text-red-400">

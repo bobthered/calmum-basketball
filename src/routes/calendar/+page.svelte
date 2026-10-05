@@ -1,26 +1,20 @@
 <script lang="ts">
-	import { Card, FormControl, H1, Label, Radio } from '#components';
+	import { H1, Tabs } from '#components';
 	import Calendar from './Calendar.svelte';
 	import List from './List.svelte';
 
 	// $state
-	let date = $state(new Date());
 	let view = $state('Month');
 
 	// variables
-	const views = ['Month', 'List'];
+	const views = [
+		{ title: 'Month', value: 'Month' },
+		{ title: 'List', value: 'List' }
+	];
 </script>
 
 <H1>Calendar</H1>
-<FormControl label="View">
-	<Card class="flex-row gap-4 self-start p-2">
-		{#each views as value}
-			<Label class="flex cursor-pointer items-center gap-2"
-				><Radio bind:group={view} {value} name="calendar-view" />{value}</Label
-			>
-		{/each}
-	</Card>
-</FormControl>
+<Tabs tabs={views} bind:value={view} class="self-start" aria-label="Calendar view" />
 {#if view === 'Month'}
 	<Calendar />
 {:else if view === 'List'}

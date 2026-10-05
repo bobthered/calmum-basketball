@@ -106,7 +106,7 @@ old sessions.
    The dialog stays open until a choice is made, and the answer is remembered
    in local storage for that account on that browser/device. Clearing browser
    storage can cause it to appear again. Notification controls are available
-   in **My Account** afterward; enabling notifications is optional.
+   in **Settings** afterward; enabling notifications is optional.
    iPhone/iPad users need iOS/iPadOS 16.4+ and must open the installed Home Screen
    app to grant permission. HTTPS is required outside localhost.
 

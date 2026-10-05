@@ -1,14 +1,5 @@
 <script lang="ts">
-	import {
-		Calendar,
-		CircleUserRound,
-		LogOut,
-		Menu,
-		MessageCircle,
-		ShieldUser,
-		Users,
-		X
-	} from '@lucide/svelte';
+	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, Users, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
@@ -29,8 +20,6 @@
 	import NotificationPreferences from '#components/NotificationPreferences.svelte';
 	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
 	import { scheduledDates, user } from '#lib/state/index.js';
-	import { signOut as endSession } from '#lib/remote/session.remote.js';
-	import { disableNotifications } from '#lib/notifications.js';
 	import { subtleReveal } from 'sveltewind/transitions';
 	import '../app.css';
 
@@ -57,23 +46,9 @@
 		{ href: '/', Icon: BasketballIcon, label: 'Home' },
 		{ href: '/calendar', Icon: Calendar, label: 'Calendar' },
 		{ href: '/messages', Icon: MessageCircle, label: 'Chat' },
-		{ href: '/my-account', Icon: CircleUserRound, label: 'My Account' }
+		{ href: '/settings', Icon: Settings, label: 'Settings' }
 	]);
 
-	const signOut = async () => {
-		try {
-			try {
-				await disableNotifications();
-			} catch {
-				/* Session logout must still work if push cleanup fails. */
-			}
-			await endSession();
-			localStorage.removeItem('_id');
-			user.value = null;
-		} catch {
-			alert('Could not sign out. Please try again.');
-		}
-	};
 	const updateScheduledDates = async () => {
 		calendarError = '';
 		try {
@@ -88,7 +63,7 @@
 
 	// $derives
 	const isLoadingModalOpen = $derived.by(() => Boolean(user.value) && !isScheduledDateInitiated);
-	const navItemCount = $derived.by(() => nav.length + 1 + (user?.value?.isAdmin ? 1 : 0));
+	const navItemCount = $derived.by(() => nav.length + (user?.value?.isAdmin ? 1 : 0));
 
 	// $effects
 	$effect(() => {
@@ -179,7 +154,6 @@
 						</Card>
 					</Popover>
 				{/if}
-				<NavItem Icon={LogOut} label="Sign Out" onclick={() => signOut()} tag="button" />
 			</Nav>
 			<Div class="relative hidden shrink-0 lg:block" {@attach closeOutsideMenu}>
 				<Button
@@ -225,15 +199,6 @@
 										>
 									{/each}
 								{/if}
-								<Button
-									type="button"
-									variants={['ghost']}
-									class="mt-3 flex items-center gap-3 p-3 text-left"
-									onclick={() => {
-										isDesktopMenuOpen = false;
-										void signOut();
-									}}><LogOut class="size-5" />Sign Out</Button
-								>
 							</nav>
 						</Card>
 					</div>

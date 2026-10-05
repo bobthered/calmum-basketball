@@ -13,6 +13,9 @@ theme.set.base(
 	'flex flex-col rounded border-0 bg-white p-4 text-current shadow-sm inset-ring-0 outline-0 dark:bg-gray-900'
 );
 theme.update.variant('card', 'outline', 'border-0 inset-ring-0 outline-0');
+theme.update.base('calendar', 'bg-gray-100 dark:bg-gray-900');
+theme.update.base('calendarDay', 'ring-1 ring-gray-300 dark:ring-gray-600');
+theme.update.variant('calendarDay', 'today', 'dark:ring-primary-500');
 theme.set.base('h1', 'text-4xl font-bold sm:text-5xl');
 theme.set.base('main', 'mx-auto flex w-full max-w-7xl flex-col overflow-auto');
 theme.set.base('header', 'lg:py-4');

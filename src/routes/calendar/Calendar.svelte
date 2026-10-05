@@ -1,140 +1,95 @@
 <script lang="ts">
-	import { ChevronLeft, ChevronRight } from '@lucide/svelte';
-	import { type Snippet } from 'svelte';
-	import { twMerge } from 'tailwind-merge';
-	import { Button, Card, Div, Spinner } from '#components';
+	import { onMount } from 'svelte';
+	import { Theme } from 'sveltewind/theme';
+	import { theme } from '#lib/ui/theme.js';
+	import { Button, Calendar as WindCalendar, Spinner } from '#components';
 	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
 	import { updateCalendar } from '#lib/remote/update-calendar.remote.js';
 	import { calendar, scheduledDates } from '#lib/state/index.js';
-	import { fade } from '#lib/transition/index.js';
 
-	type CalendarDate = {
-		date: Date;
-		dateString: string;
-		isScheduled: boolean;
-	};
-	type Props = {
-		children?: Snippet;
-		daySnippet?: Snippet<[CalendarDate]>;
-		isEditable?: boolean;
-	};
-
-	let { children, daySnippet, isEditable = false }: Props = $props();
-
-	// $state
+	let { isEditable = false }: { isEditable?: boolean } = $props();
 	let isLoading = $state(true);
+	let error = $state('');
+	let pendingDate: string | null = $state(null);
+	const month = $derived(
+		`${calendar.currentDate.getFullYear()}-${String(calendar.currentDate.getMonth() + 1).padStart(2, '0')}-01`
+	);
+	const calendarTheme = new Theme($state.snapshot(theme.get.theme()));
+	// This is a schedule with multiple highlighted dates, rather than a single-date picker.
+	calendarTheme.set.variant('calendarDay', 'selected', '');
+	calendarTheme.set.variant('calendarDay', 'disabled', 'cursor-default');
 
-	// variables
-	const dayHeadings = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-	const updateScheduledDates = async () => {
-		await findCalendar().refresh();
-		const result = await findCalendar();
-		scheduledDates.value = result.map(({ date }: { date: string }) => date);
-		isLoading = false;
-	};
-
-	// $derives
-	const calendarHeading = $derived.by(() => {
-		return calendar.currentDate.toLocaleString('default', { month: 'long', year: '2-digit' });
+	async function load() {
+		isLoading = true;
+		error = '';
+		try {
+			const query = findCalendar();
+			await query.refresh();
+			const rows = await findCalendar();
+			scheduledDates.value = rows.map(({ date }: { date: string }) => date);
+		} catch {
+			error = 'Could not load the basketball schedule. Please try again.';
+		} finally {
+			isLoading = false;
+		}
+	}
+	onMount(() => {
+		void load();
 	});
-
-	// $effects
-	$effect(() => {
-		updateScheduledDates();
-	});
+	function changeMonth(value: string) {
+		const [year, month] = value.split('-').map(Number);
+		calendar.currentDate = new Date(year, month - 1, 1);
+	}
+	async function toggleDate(date: string) {
+		if (!isEditable || isLoading || pendingDate) return;
+		const isScheduled = !scheduledDates.value.includes(date);
+		pendingDate = date;
+		error = '';
+		try {
+			const result = await updateCalendar({ date, isScheduled });
+			if (!result.success) throw new Error('Save failed');
+			scheduledDates.value = isScheduled
+				? [...new Set([...scheduledDates.value, date])]
+				: scheduledDates.value.filter((value) => value !== date);
+		} catch {
+			error = 'Could not save the schedule. The date has not changed; please try again.';
+		} finally {
+			pendingDate = null;
+		}
+	}
 </script>
 
-<Card class="relative grid grid-cols-7 overflow-hidden p-0 lg:mr-auto">
-	{#if children}
-		{@render children()}
-	{:else}
-		<Div class="col-span-7 flex items-center justify-between">
-			<Div class="flex p-1">
-				<Button
-					class="px-2 py-2"
-					onclick={() => {
-						calendar.currentDate = new Date(
-							calendar.currentDate.setMonth(calendar.currentDate.getMonth() - 1)
-						);
-					}}
-				>
-					<ChevronLeft />
-				</Button>
-			</Div>
-			<Div>{calendarHeading}</Div>
-			<Div class="flex p-1">
-				<Button
-					class="px-2 py-2"
-					onclick={() => {
-						calendar.currentDate = new Date(
-							calendar.currentDate.setMonth(calendar.currentDate.getMonth() + 1)
-						);
-					}}
-				>
-					<ChevronRight />
-				</Button>
-			</Div>
-		</Div>
-		{#each dayHeadings as dayHeading}
-			<Div class="py-3 text-center">{dayHeading}</Div>
-		{/each}
-		{#each calendar.calendar as calendarDate}
-			{#if daySnippet}
-				{@render daySnippet(calendarDate)}
-			{:else}
-				<Div class="aspect-squre flex h-12 p-1">
-					{#if isEditable}
-						<Button
-							class={twMerge(
-								'flex h-10 w-full items-center justify-center rounded bg-transparent p-0 text-center text-current outline-1 -outline-offset-1 outline-black/10 focus:outline-primary-700 lg:aspect-square dark:outline-white/10 dark:focus:outline-primary-700',
-								calendarDate.date.getMonth() !== calendar.currentDate.getMonth()
-									? 'disabled:bg-transparent disabled:text-current disabled:opacity-50'
-									: undefined,
-								calendarDate.isScheduled
-									? 'bg-primary-700 text-white focus:outline-primary-500 dark:focus:outline-primary-500'
-									: undefined
-							)}
-							disabled={calendarDate.date.getMonth() !== calendar.currentDate.getMonth()
-								? true
-								: undefined}
-							onclick={async () => {
-								calendarDate.isScheduled = !calendarDate.isScheduled;
-								if (calendarDate.isScheduled) scheduledDates.value.push(calendarDate.dateString);
-								if (!calendarDate.isScheduled)
-									scheduledDates.value = scheduledDates.value.filter(
-										(scheduledDate) => scheduledDate !== calendarDate.dateString
-									);
-								await updateCalendar({
-									date: calendarDate.dateString,
-									isScheduled: calendarDate.isScheduled
-								});
-							}}
-						>
-							{calendarDate.date.getDate()}
-						</Button>
-					{:else}
-						<Div
-							class={twMerge(
-								'flex h-10 w-full items-center justify-center rounded outline-1 -outline-offset-1 outline-black/10 lg:aspect-square dark:outline-white/10',
-								calendarDate.isScheduled ? 'bg-primary-700 text-white' : undefined,
-								calendarDate.date.getMonth() !== calendar.currentDate.getMonth()
-									? 'bg-transparent opacity-50 outline-0'
-									: undefined
-							)}
-						>
-							{calendarDate.date.getDate()}
-						</Div>
-					{/if}
-				</Div>
-			{/if}
-		{/each}
+<div class="relative w-full max-w-sm space-y-3 lg:mr-auto">
+	<WindCalendar
+		{month}
+		onMonthChange={changeMonth}
+		theme={calendarTheme}
+		class="w-full"
+		label="Basketball schedule"
+		disabled={isLoading}
+		isDateDisabled={() => !isEditable || pendingDate !== null}
+		onValueChange={(date) => {
+			void toggleDate(date);
+		}}
+	>
+		{#snippet day({ date, day })}
+			<span
+				class={`flex h-full w-full items-center justify-center rounded-md ${scheduledDates.value.includes(date) ? 'bg-primary-700 text-white' : ''}`}
+				title={scheduledDates.value.includes(date)
+					? 'Basketball scheduled'
+					: 'No basketball scheduled'}
+			>
+				{#if pendingDate === date}<Spinner class="size-4" />{:else}{day}{/if}
+			</span>
+		{/snippet}
+	</WindCalendar>
+	<p class="text-sm text-gray-600 dark:text-gray-400">
+		Burgundy dates have basketball scheduled.{#if isEditable}
+			Click a date to add or remove basketball.{/if}
+	</p>
+	{#if isLoading}<p role="status" class="text-sm">Loading schedule...</p>{/if}
+	{#if error}
+		<p role="alert" class="text-sm text-red-600 dark:text-red-400">{error}</p>
+		{#if error.startsWith('Could not load')}<Button type="button" onclick={load}>Retry</Button>{/if}
 	{/if}
-	{#if isLoading}
-		<div
-			class="absolute top-0 left-0 flex h-full w-full items-center justify-center bg-white/70 backdrop-blur dark:bg-black/70"
-			transition:fade={{ duration: 200 }}
-		>
-			<Spinner class="h-20 w-20" />
-		</div>
-	{/if}
-</Card>
+</div>
