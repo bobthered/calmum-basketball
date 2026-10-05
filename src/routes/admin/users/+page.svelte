@@ -143,7 +143,11 @@
 						undone.
 					</Div>
 					<Div class="flex w-full justify-end space-x-2">
-						<Button onclick={() => (deleteModal.isOpen = false)}>Cancel</Button>
+						<Button
+							type="button"
+							disabled={deleteModal.isPending}
+							onclick={() => (deleteModal.isOpen = false)}>Cancel</Button
+						>
 						<SubmitButton bind:isPending={deleteModal.isPending} class="bg-red-500"
 							>Delete</SubmitButton
 						>
@@ -167,6 +171,8 @@
 		)}
 	>
 		<Button
+			type="button"
+			aria-label={`Delete ${object.username}`}
 			class="bg-red-500 px-2 py-2"
 			onclick={() => {
 				deleteModal.isOpen = true;
