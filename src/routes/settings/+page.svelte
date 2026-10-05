@@ -52,9 +52,6 @@
 </script>
 
 <svelte:head><title>Settings | Cal-Mum Rec. Basketball</title></svelte:head>
-<p class="text-sm text-gray-600 dark:text-gray-400">
-	Manage your personal information, notifications, and account.
-</p>
 {#if user.value}
 	<Card class="gap-2">
 		{#each sections as { href, Icon, title, description }}

@@ -108,16 +108,13 @@
 
 <svelte:head><title>Basketball Chat | Cal-Mum Rec. Basketball</title></svelte:head>
 
-<div class="flex min-h-0 flex-1 flex-col gap-4">
+<div class="flex min-h-0 flex-1 flex-col gap-6">
 	<div class="flex flex-wrap items-center justify-between gap-2">
-		<H1>Basketball Chat</H1>
+		<H1>Chat</H1>
 		<span class="text-sm text-gray-600 dark:text-gray-400" role="status">
 			{live.connected ? 'Live' : 'Reconnecting...'}
 		</span>
 	</div>
-	<p class="text-sm text-gray-600 dark:text-gray-400">
-		A group conversation for everyone playing basketball.
-	</p>
 	{#if live.error}
 		<div role="alert" class="flex flex-wrap items-center gap-2 text-red-600 dark:text-red-400">
 			<p>Could not connect to chat. {live.error.message}</p>

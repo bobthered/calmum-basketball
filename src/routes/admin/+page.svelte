@@ -19,7 +19,6 @@
 
 <svelte:head><title>Admin | Cal-Mum Rec. Basketball</title></svelte:head>
 <H1>Admin</H1>
-<p class="text-sm text-gray-600 dark:text-gray-400">Manage users and the basketball schedule.</p>
 <Card class="w-full max-w-xl gap-2">
 	{#each sections as { href, Icon, title, description }, index}
 		{#if index > 0}<hr class="border-0 border-t border-gray-200 dark:border-gray-700" />{/if}
