@@ -14,6 +14,10 @@ function measure(reason: string) {
 	const dynamicHeight = parseFloat(style.height);
 	const safeTop = parseFloat(style.paddingTop);
 	const safeBottom = parseFloat(style.paddingBottom);
+	probe.style.height = '100vh';
+	const viewportHeight = parseFloat(getComputedStyle(probe).height);
+	probe.style.height = '100lvh';
+	const largeHeight = parseFloat(getComputedStyle(probe).height);
 	probe.remove();
 	const rect = (node: Element | null) => {
 		if (!node) return null;
@@ -28,6 +32,8 @@ function measure(reason: string) {
 		innerWidth: window.innerWidth,
 		clientHeight: document.documentElement.clientHeight,
 		dynamicHeight,
+		viewportHeight,
+		largeHeight,
 		safeTop,
 		safeBottom,
 		visualViewport: viewport

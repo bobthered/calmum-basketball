@@ -2,6 +2,17 @@
 @import 'sveltewind/themes/palettes.css';
 @source '../node_modules/sveltewind/dist';
 
+/* iOS standalone can under-report dvh by the status-bar inset on cold launch.
+   Keep the shell in normal flow and preserve the navigation's safe-area padding. */
+@supports (-webkit-touch-callout: none) {
+	@media (display-mode: standalone) {
+		#app-shell {
+			min-height: 100vh;
+			max-height: 100vh;
+		}
+	}
+}
+
 /* Only Settings navigations opt into these mobile page transitions. */
 @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
 	html[data-settings-direction]::view-transition-old(root),
