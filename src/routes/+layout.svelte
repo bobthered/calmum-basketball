@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, Users, X } from '@lucide/svelte';
+	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { page } from '$app/state';
 	import { isActiveRoute } from '#lib/ui/navigation.js';
@@ -15,7 +15,6 @@
 		Modal,
 		Nav,
 		NavItem,
-		Popover,
 		Spinner
 	} from '#components';
 	import SignUpModal from '#components/SignUpModal.svelte';
@@ -28,11 +27,7 @@
 	let { children } = $props();
 
 	// $state
-	let adminNav = $state([
-		{ href: '/admin/calendar', Icon: Calendar, label: 'Calendar' },
-		{ href: '/admin/users', Icon: Users, label: 'Users' }
-	]);
-	let isAdminPopoverOpen = $state(false);
+
 	let isDesktopMenuOpen = $state(false);
 	let menuButton: HTMLButtonElement | null = $state(null);
 	function closeOutsideMenu(node: HTMLElement) {
@@ -73,7 +68,10 @@
 
 	// $derives
 	const isLoadingModalOpen = $derived.by(() => Boolean(user.value) && !isScheduledDateInitiated);
-	const navItemCount = $derived.by(() => nav.length + (user?.value?.isAdmin ? 1 : 0));
+	const visibleNav = $derived(
+		user.value?.isAdmin ? [...nav, { href: '/admin', Icon: ShieldUser, label: 'Admin' }] : nav
+	);
+	const navItemCount = $derived(visibleNav.length);
 
 	// $effects
 	$effect(() => {
@@ -90,7 +88,6 @@
 	}}
 	onresize={() => {
 		if (window.innerWidth < 1024) isDesktopMenuOpen = false;
-		else isAdminPopoverOpen = false;
 	}}
 />
 
@@ -128,52 +125,9 @@
 				<H1 class="truncate text-3xl sm:text-3xl">Cal-Mum Rec. Basketball</H1>
 			</Div>
 			<Nav {navItemCount} class="lg:hidden">
-				{#each nav as { href, Icon, label }}
+				{#each visibleNav as { href, Icon, label }}
 					<NavItem {href} {Icon} {label} />
 				{/each}
-				{#if user.value.isAdmin}
-					<Popover bind:isVisible={isAdminPopoverOpen} placement="top" class="p-0">
-						{#snippet trigger(triggerProps)}
-							<NavItem
-								{...triggerProps}
-								class={twMerge(
-									'w-full',
-									isAdminPopoverOpen ? 'bg-primary-800 lg:bg-white' : undefined
-								)}
-								Icon={ShieldUser}
-								active={isActiveRoute(page.url.pathname, '/admin')}
-								label="Admin"
-								tag="button"
-							/>
-						{/snippet}
-						<Card
-							class={twMerge(
-								'rounded-b-none bg-primary-800 p-0 text-white dark:bg-primary-800',
-								'lg:rounded lg:bg-white lg:text-primary-700 dark:lg:bg-white'
-							)}
-						>
-							{#each adminNav as { href, Icon, label }}
-								<a
-									class={twMerge(
-										'flex items-center space-x-2 px-6 py-3',
-										isActiveRoute(page.url.pathname, href)
-											? 'bg-primary-700 font-semibold text-white'
-											: ''
-									)}
-									{href}
-									aria-current={isActiveRoute(page.url.pathname, href) ? 'page' : undefined}
-									title={label}
-									onclick={() => (isAdminPopoverOpen = false)}
-								>
-									<Icon class="lg:hidden" />
-									<Div>
-										{label}
-									</Div>
-								</a>
-							{/each}
-						</Card>
-					</Popover>
-				{/if}
 			</Nav>
 			<Div class="relative hidden shrink-0 lg:block" {@attach closeOutsideMenu}>
 				<Button
@@ -196,7 +150,7 @@
 					>
 						<Card class="max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-t-none shadow-lg">
 							<nav aria-label="Desktop navigation" class="flex flex-col gap-2">
-								{#each nav as { href, Icon, label } (href)}
+								{#each visibleNav as { href, Icon, label } (href)}
 									<A
 										{href}
 										variants={['ghost']}
@@ -206,21 +160,6 @@
 										><Icon class="size-5 shrink-0" />{label}</A
 									>
 								{/each}
-								{#if user.value.isAdmin}
-									<h3 class="mt-3 px-3 text-sm font-semibold text-gray-600 dark:text-gray-400">
-										Administration
-									</h3>
-									{#each adminNav as { href, Icon, label } (href)}
-										<A
-											{href}
-											variants={['ghost']}
-											class={desktopLinkClass(href)}
-											aria-current={isActiveRoute(page.url.pathname, href) ? 'page' : undefined}
-											onclick={() => (isDesktopMenuOpen = false)}
-											><Icon class="size-5 shrink-0" />{label}</A
-										>
-									{/each}
-								{/if}
 							</nav>
 						</Card>
 					</div>

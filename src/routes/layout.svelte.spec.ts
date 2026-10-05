@@ -70,46 +70,31 @@ it.each([
 		.not.toHaveAttribute('aria-current');
 });
 
-it('highlights the admin section and its selected link in both navigation layouts', async () => {
-	route.url = new URL('https://basketball.example/admin/users');
-	user.value = account;
-	await page.viewport(390, 844);
-	render(Layout);
-	const admin = page.getByRole('button', { name: 'Admin', exact: true });
-	await expect.element(admin).toHaveAttribute('aria-current', 'location');
-	await admin.click();
-	await expect
-		.element(page.getByRole('link', { name: 'Users', exact: true }))
-		.toHaveAttribute('aria-current', 'page');
-	await page.viewport(1100, 900);
-	await page.getByRole('button', { name: 'Open navigation' }).click();
-	await expect
-		.element(
-			page
-				.getByRole('navigation', { name: 'Desktop navigation' })
-				.getByRole('link', { name: 'Users', exact: true })
-		)
-		.toHaveAttribute('aria-current', 'page');
-});
-
-it('opens and closes the SvelteWind admin popover using the complete trigger attributes', async () => {
-	await page.viewport(390, 844);
-	user.value = account;
-	render(Layout);
-	const trigger = page.getByRole('button', { name: 'Admin', exact: true });
-	await expect.element(trigger).toHaveAttribute('aria-expanded', 'false');
-	await trigger.click();
-	await expect.element(trigger).toHaveAttribute('aria-expanded', 'true');
-	await expect.element(page.getByRole('link', { name: 'Users', exact: true })).toBeVisible();
-	const panel = document.querySelector('[popover]')!;
-	expect(panel.matches(':popover-open')).toBe(true);
-	await trigger.click();
-	await expect.element(trigger).toHaveAttribute('aria-expanded', 'false');
-	await expect
-		.element(page.getByRole('link', { name: 'Users', exact: true }))
-		.not.toBeInTheDocument();
-});
-
+it.each(['/admin', '/admin/users', '/admin/calendar'])(
+	'links directly to Admin and keeps it active for %s',
+	async (path) => {
+		route.url = new URL(path, 'https://basketball.example');
+		user.value = account;
+		await page.viewport(390, 844);
+		render(Layout);
+		const admin = page.getByRole('link', { name: 'Admin', exact: true });
+		await expect.element(admin).toHaveAttribute('href', '/admin');
+		await expect.element(admin).toHaveAttribute('aria-current', 'page');
+		expect(document.querySelector('[popover]')).toBeNull();
+		await page.viewport(1100, 900);
+		await page.getByRole('button', { name: 'Open navigation' }).click();
+		const desktop = page.getByRole('navigation', { name: 'Desktop navigation' });
+		await expect
+			.element(desktop.getByRole('link', { name: 'Admin', exact: true }))
+			.toHaveAttribute('href', '/admin');
+		await expect
+			.element(desktop.getByRole('link', { name: 'Admin', exact: true }))
+			.toHaveAttribute('aria-current', 'page');
+		await expect
+			.element(desktop.getByRole('link', { name: 'Users', exact: true }))
+			.not.toBeInTheDocument();
+	}
+);
 it('toggles the sliding desktop menu in place and closes it on outside clicks', async () => {
 	await page.viewport(1100, 800);
 	user.value = account;
@@ -125,7 +110,7 @@ it('toggles the sliding desktop menu in place and closes it on outside clicks', 
 	await trigger.click();
 	await expect.element(page.getByRole('navigation', { name: 'Desktop navigation' })).toBeVisible();
 	await expect.element(page.getByRole('link', { name: 'Chat', exact: true })).toBeVisible();
-	await expect.element(page.getByRole('link', { name: 'Users', exact: true })).toBeVisible();
+	await expect.element(page.getByRole('link', { name: 'Admin', exact: true })).toBeVisible();
 	const panel = document.getElementById('desktop-navigation')!.getBoundingClientRect();
 	expect(Math.abs(panel.right - button.right)).toBeLessThan(1);
 	expect(panel.top).toBeGreaterThanOrEqual(button.bottom);
