@@ -87,7 +87,12 @@ old sessions.
    from `.env` into Vercel's production environment variables and redeploy. Keep
    the same VAPID keys on future deployments; changing them requires devices to
    resubscribe. `VAPID_SUBJECT` can be a real contact `mailto:` address or HTTPS URL.
-3. Each user opens Chat and taps **Enable notifications** on each device.
+3. Each user answers the notification dialog after login on each device.
+   Choose **Enable notifications** to subscribe or **Not now** to skip.
+   The dialog stays open until a choice is made, and the answer is remembered
+   in local storage for that account on that browser/device. Clearing browser
+   storage can cause it to appear again. Notification controls are available
+   in **My Account** afterward; enabling notifications is optional.
    iPhone/iPad users need iOS/iPadOS 16.4+ and must open the installed Home Screen
    app to grant permission. HTTPS is required outside localhost.
 

@@ -22,6 +22,7 @@
 		Spinner
 	} from '#components';
 	import SignUpModal from '#components/SignUpModal.svelte';
+	import NotificationPreferences from '#components/NotificationPreferences.svelte';
 	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
 	import { scheduledDates, user } from '#lib/state/index.js';
 	import { signOut as endSession } from '#lib/remote/session.remote.js';
@@ -152,6 +153,11 @@
 	</Header>
 {/if}
 <SignUpModal />
+{#if user.value && isScheduledDateInitiated}
+	{#key user.value._id}
+		<NotificationPreferences userId={user.value._id} prompt />
+	{/key}
+{/if}
 <Modal isOpen={isLoadingModalOpen}>
 	<Div class="flex flex-col items-center justify-center">
 		<Spinner class="h-20 w-20" />

@@ -1,19 +1,11 @@
 <script lang="ts">
 	import { onMount, tick, untrack } from 'svelte';
-	import { Button, Card, H1 } from '#components';
+	import { Button, H1 } from '#components';
 	import {
 		groupMessages,
 		olderGroupMessages,
 		sendGroupMessage
 	} from '#lib/remote/messages.remote.js';
-	import { notificationSettings } from '#lib/remote/notifications.remote.js';
-	import {
-		disableNotifications,
-		enableNotifications,
-		needsHomeScreenInstall,
-		restoreNotifications,
-		supportsNotifications
-	} from '#lib/notifications.js';
 	import { user } from '#lib/state/index.js';
 	import { mergeMessages, type ChatMessage } from '#lib/types/messages.js';
 
@@ -31,12 +23,6 @@
 	let pending: { text: string; clientId: string } | null = $state(null);
 	let scrollArea: HTMLDivElement;
 	let composer: HTMLTextAreaElement;
-	let notificationMessage = $state('');
-	let notificationsEnabled = $state(false);
-	let notificationsBusy = $state(false);
-	let notificationsSupported = $state(false);
-	let installNeeded = $state(false);
-	let publicKey = $state('');
 	const messages = $derived(mergeMessages(history, received, sent));
 	const errorText = (err: unknown, fallback: string) =>
 		err instanceof Error ? err.message : fallback;
@@ -72,17 +58,6 @@
 			});
 	});
 	onMount(() => {
-		notificationsSupported = supportsNotifications();
-		installNeeded = needsHomeScreenInstall();
-		void (async () => {
-			try {
-				publicKey = (await notificationSettings()).publicKey;
-				if (notificationsSupported && !installNeeded && publicKey)
-					notificationsEnabled = await restoreNotifications();
-			} catch (err) {
-				notificationMessage = errorText(err, 'Could not check notification settings.');
-			}
-		})();
 		const reconnect = () => {
 			if (document.visibilityState === 'visible') void live.reconnect();
 		};
@@ -129,19 +104,6 @@
 			loadingOlder = false;
 		}
 	}
-	async function toggleNotifications() {
-		notificationsBusy = true;
-		notificationMessage = '';
-		try {
-			if (notificationsEnabled) await disableNotifications();
-			else await enableNotifications(publicKey);
-			notificationsEnabled = !notificationsEnabled;
-		} catch (err) {
-			notificationMessage = errorText(err, 'Could not change notifications.');
-		} finally {
-			notificationsBusy = false;
-		}
-	}
 </script>
 
 <svelte:head><title>Basketball Chat | Cal-Mum Rec. Basketball</title></svelte:head>
@@ -156,42 +118,6 @@
 	<p class="text-sm text-gray-600 dark:text-gray-400">
 		A group conversation for everyone playing basketball.
 	</p>
-	<Card class="m-0 flex flex-col gap-2 p-3">
-		{#if installNeeded}
-			<p class="text-sm">
-				On iPhone or iPad, add this app to your Home Screen and open it there to enable
-				notifications.
-			</p>
-		{:else if !notificationsSupported}
-			<p class="text-sm">
-				Device notifications are unavailable in this browser. You can still use group chat.
-			</p>
-		{:else if !publicKey}
-			<p class="text-sm">Device notifications will be available once they are configured.</p>
-		{:else}
-			<div class="flex flex-wrap items-center justify-between gap-2">
-				<p class="text-sm">
-					{notificationsEnabled
-						? 'Notifications are on for this device.'
-						: 'Get an alert when someone posts a message.'}
-				</p>
-				<Button
-					class="bg-primary-700 text-white"
-					disabled={notificationsBusy}
-					onclick={toggleNotifications}
-				>
-					{notificationsBusy
-						? 'Updating…'
-						: notificationsEnabled
-							? 'Turn off notifications'
-							: 'Enable notifications'}
-				</Button>
-			</div>
-		{/if}
-		{#if notificationMessage}<p class="text-sm text-red-600 dark:text-red-400" role="alert">
-				{notificationMessage}
-			</p>{/if}
-	</Card>
 	{#if live.error}
 		<div role="alert" class="flex flex-wrap items-center gap-2 text-red-600 dark:text-red-400">
 			<p>Could not connect to chat. {live.error.message}</p>

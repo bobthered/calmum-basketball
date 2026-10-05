@@ -1,5 +1,6 @@
 <script>
 	import { TriangleAlert } from '@lucide/svelte';
+	import NotificationPreferences from '#components/NotificationPreferences.svelte';
 	import {
 		Button,
 		Card,
@@ -69,6 +70,9 @@
 		</Form>
 	</Card>
 	<Button class="bg-red-500" onclick={() => (isDeleteModalOpen = true)}>Delete Account</Button>
+	{#key user.value._id}
+		<NotificationPreferences userId={user.value._id} />
+	{/key}
 {/if}
 <Modal bind:isOpen={isDeleteModalOpen}>
 	<Div class="flex flex-col items-center space-y-6">
