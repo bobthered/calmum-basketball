@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, X } from '@lucide/svelte';
-	import { twMerge } from 'tailwind-merge';
-	import { page } from '$app/state';
-	import { isActiveRoute } from '#lib/ui/navigation.js';
+	// Imports
+	import '../app.css';
+	import { Calendar, Menu, MessageCircle, Settings, ShieldUser, X } from '@lucide/svelte';
 	import {
-		BasketballIcon,
 		A,
+		BasketballIcon,
 		Button,
 		Card,
 		Div,
@@ -15,44 +14,36 @@
 		Modal,
 		Nav,
 		NavItem,
-		Spinner
+		P,
+		Spinner,
+		WindNav
 	} from '#components';
-	import SignUpModal from '#components/SignUpModal.svelte';
 	import NotificationPreferences from '#components/NotificationPreferences.svelte';
+	import SignUpModal from '#components/SignUpModal.svelte';
 	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
 	import { scheduledDates, user } from '#lib/state/index.js';
+	import { isActiveRoute } from '#lib/ui/navigation.js';
+	import { page } from '$app/state';
 	import { subtleReveal } from 'sveltewind/transitions';
-	import '../app.css';
+	import { twMerge } from 'tailwind-merge';
 
-	let { children } = $props();
-
-	// $state
-
-	let isDesktopMenuOpen = $state(false);
-	let menuButton: HTMLButtonElement | null = $state(null);
-	function closeOutsideMenu(node: HTMLElement) {
+	// Helper functions
+	const closeOutsideMenu = (node: HTMLElement) => {
 		const close = (event: PointerEvent) => {
 			if (isDesktopMenuOpen && !node.contains(event.target as Node)) isDesktopMenuOpen = false;
 		};
 		document.addEventListener('pointerdown', close, true);
 		return () => document.removeEventListener('pointerdown', close, true);
-	}
-	let isScheduledDateInitiated = $state(false);
-	let calendarError = $state('');
-	let nav = $state([
-		{ href: '/', Icon: BasketballIcon, label: 'Home' },
-		{ href: '/calendar', Icon: Calendar, label: 'Calendar' },
-		{ href: '/messages', Icon: MessageCircle, label: 'Chat' },
-		{ href: '/settings', Icon: Settings, label: 'Settings' }
-	]);
-	function desktopLinkClass(href: string) {
+	};
+
+	const desktopLinkClass = (href: string) => {
 		return twMerge(
 			'flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50',
 			isActiveRoute(page.url.pathname, href)
 				? 'bg-primary-50 font-semibold text-primary-800 ring-1 ring-primary-200 hover:bg-primary-100 hover:text-primary-800 focus:text-primary-800 dark:bg-gray-800 dark:text-primary-200 dark:ring-gray-700 dark:hover:text-primary-200 dark:focus:text-primary-200'
 				: ''
 		);
-	}
+	};
 
 	const updateScheduledDates = async () => {
 		calendarError = '';
@@ -66,11 +57,33 @@
 		}
 	};
 
-	// $derives
+	// $props
+	let { children } = $props();
+
+	// $state
+	let calendarError = $state('');
+
+	let isDesktopMenuOpen = $state(false);
+
+	let isScheduledDateInitiated = $state(false);
+
+	let menuButton: HTMLButtonElement | null = $state(null);
+
+	let nav = $state([
+		{ href: '/', Icon: BasketballIcon, label: 'Home' },
+		{ href: '/calendar', Icon: Calendar, label: 'Calendar' },
+		{ href: '/messages', Icon: MessageCircle, label: 'Chat' },
+		{ href: '/settings', Icon: Settings, label: 'Settings' }
+	]);
+
+	// $derived
 	const isLoadingModalOpen = $derived.by(() => Boolean(user.value) && !isScheduledDateInitiated);
+
+	// Initialize visibleNav before deriving its item count.
 	const visibleNav = $derived(
 		user.value?.isAdmin ? [...nav, { href: '/admin', Icon: ShieldUser, label: 'Admin' }] : nav
 	);
+
 	const navItemCount = $derived(visibleNav.length);
 
 	// $effects
@@ -109,7 +122,7 @@
 	)}
 >
 	{#if user.value !== null}
-		{#if calendarError}<p role="alert" class="text-red-600">{calendarError}</p>{/if}
+		{#if calendarError}<P role="alert" class="text-red-600">{calendarError}</P>{/if}
 		{@render children?.()}
 	{/if}
 </Main>
@@ -139,13 +152,13 @@
 						/>{/if}</Button
 				>
 				{#if isDesktopMenuOpen}
-					<div
+					<Div
 						id="desktop-navigation"
 						class="absolute top-full right-0 mt-4 hidden w-80 max-w-[calc(100vw-2rem)] origin-top-right lg:block"
-						transition:subtleReveal={{ duration: 200 }}
+						transition={[subtleReveal, { duration: 200 }]}
 					>
 						<Card class="max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-t-none shadow-lg">
-							<nav aria-label="Desktop navigation" class="flex flex-col gap-2">
+							<WindNav aria-label="Desktop navigation" class="flex flex-col gap-2">
 								{#each visibleNav as { href, Icon, label } (href)}
 									<A
 										{href}
@@ -156,9 +169,9 @@
 										><Icon class="size-5 shrink-0" />{label}</A
 									>
 								{/each}
-							</nav>
+							</WindNav>
 						</Card>
-					</div>
+					</Div>
 				{/if}
 			</Div>
 		</Div>

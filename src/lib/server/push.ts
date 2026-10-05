@@ -1,13 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import webpush from 'web-push';
-import { VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT } from '$app/env/private';
+import { VAPID_PRIVATE_KEY, VAPID_PUBLIC_KEY, VAPID_SUBJECT } from '$app/env/private';
 import { connect } from '#lib/mongoose/connect.js';
 import { Message } from '#lib/mongoose/models/Message.js';
 import { PushSubscription } from '#lib/mongoose/models/PushSubscription.js';
 import { User } from '#lib/mongoose/models/User.js';
-
 export const pushConfigured = () => Boolean(VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY && VAPID_SUBJECT);
-export function allowedPushEndpoint(endpoint: string) {
+export const allowedPushEndpoint = (endpoint: string) => {
 	try {
 		const url = new URL(endpoint);
 		return (
@@ -23,12 +22,12 @@ export function allowedPushEndpoint(endpoint: string) {
 	} catch {
 		return false;
 	}
-}
-export async function deliverGroupNotifications(messageId?: string) {
+};
+export const deliverGroupNotifications = async (messageId?: string) => {
 	if (!pushConfigured()) return;
 	await connect();
 	webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-	const deadline = Date.now() + 200_000;
+	const deadline = Date.now() + 200000;
 	for (let job = 0; job < (messageId ? 1 : 10); job++) {
 		if (Date.now() >= deadline) break;
 		const lease = randomUUID();
@@ -40,7 +39,7 @@ export async function deliverGroupNotifications(messageId?: string) {
 				pushAfter: { $lte: now }
 			},
 			{
-				$set: { pushLease: lease, pushAfter: new Date(Date.now() + 120_000) },
+				$set: { pushLease: lease, pushAfter: new Date(Date.now() + 120000) },
 				$inc: { pushAttempts: 1 }
 			},
 			{ new: true, sort: { createdAt: 1 } }
@@ -93,7 +92,7 @@ export async function deliverGroupNotifications(messageId?: string) {
 									messageId: String(message._id),
 									url: '/messages'
 								}),
-								{ TTL: 86400, timeout: 10_000, urgency: 'normal' }
+								{ TTL: 86400, timeout: 10000, urgency: 'normal' }
 							);
 							await Message.updateOne(
 								{ _id: message._id, pushLease: lease },
@@ -113,7 +112,7 @@ export async function deliverGroupNotifications(messageId?: string) {
 				{ _id: message._id, pushLease: lease },
 				{
 					pushPending: failed && message.pushAttempts < 8,
-					pushAfter: new Date(Date.now() + Math.min(3600_000, 30_000 * 2 ** message.pushAttempts)),
+					pushAfter: new Date(Date.now() + Math.min(3600000, 30000 * 2 ** message.pushAttempts)),
 					pushLease: ''
 				}
 			);
@@ -121,11 +120,11 @@ export async function deliverGroupNotifications(messageId?: string) {
 			await Message.updateOne(
 				{ _id: message._id, pushLease: lease },
 				{
-					pushAfter: new Date(Date.now() + 60_000),
+					pushAfter: new Date(Date.now() + 60000),
 					pushLease: ''
 				}
 			);
 			throw err;
 		}
 	}
-}
+};

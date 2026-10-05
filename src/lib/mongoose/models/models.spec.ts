@@ -1,6 +1,5 @@
 import { expect, it, vi } from 'vitest';
-
-async function loadModels() {
+const loadModels = async () => {
 	return Promise.all([
 		import('./Calendar'),
 		import('./User'),
@@ -16,8 +15,7 @@ async function loadModels() {
 		session.Session,
 		subscription.PushSubscription
 	]);
-}
-
+};
 it('reuses compiled models after repeated server module reloads without connecting to MongoDB', async () => {
 	const original = await loadModels();
 	for (let reload = 0; reload < 2; reload++) {

@@ -1,16 +1,17 @@
 <script lang="ts">
-	import { H1, Tabs } from '#components';
+	// Imports
 	import Calendar from './Calendar.svelte';
 	import List from './List.svelte';
+	import { H1, Tabs } from '#components';
 
-	// $state
-	let view = $state('Month');
-
-	// variables
+	// Constants
 	const views = [
 		{ title: 'Month', value: 'Month' },
 		{ title: 'List', value: 'List' }
 	];
+
+	// $state
+	let view = $state('Month');
 </script>
 
 <H1>Calendar</H1>

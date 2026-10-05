@@ -3,8 +3,7 @@ import {
 	subscribeNotifications,
 	unsubscribeNotifications
 } from '#lib/remote/notifications.remote.js';
-
-export function supportsNotifications() {
+export const supportsNotifications = () => {
 	return (
 		typeof window !== 'undefined' &&
 		window.isSecureContext &&
@@ -12,8 +11,8 @@ export function supportsNotifications() {
 		'PushManager' in window &&
 		'Notification' in window
 	);
-}
-export function needsHomeScreenInstall() {
+};
+export const needsHomeScreenInstall = () => {
 	if (typeof window === 'undefined') return false;
 	const ios =
 		/iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -21,19 +20,23 @@ export function needsHomeScreenInstall() {
 	return (
 		ios &&
 		!window.matchMedia('(display-mode: standalone)').matches &&
-		!(navigator as Navigator & { standalone?: boolean }).standalone
+		!(
+			navigator as Navigator & {
+				standalone?: boolean;
+			}
+		).standalone
 	);
-}
-async function registration() {
+};
+const registration = async () => {
 	await navigator.serviceWorker.register('/service-worker.js', { type: 'module', scope: '/' });
 	return navigator.serviceWorker.ready;
-}
-export async function notificationSubscription() {
+};
+export const notificationSubscription = async () => {
 	if (!supportsNotifications()) return null;
 	const registered = await navigator.serviceWorker.getRegistration('/');
 	return registered ? registered.pushManager.getSubscription() : null;
-}
-async function save(subscription: PushSubscription) {
+};
+const save = async (subscription: PushSubscription) => {
 	const json = subscription.toJSON();
 	if (!json.endpoint || !json.keys?.auth || !json.keys?.p256dh)
 		throw new Error('Could not register this device.');
@@ -41,8 +44,8 @@ async function save(subscription: PushSubscription) {
 		endpoint: json.endpoint,
 		keys: { auth: json.keys.auth, p256dh: json.keys.p256dh }
 	});
-}
-export async function enableNotifications(publicKey: string) {
+};
+export const enableNotifications = async (publicKey: string) => {
 	if (!supportsNotifications() || needsHomeScreenInstall())
 		throw new Error('Install the app on your Home Screen to enable notifications.');
 	// Invoke permission immediately from the button gesture, before awaiting server work.
@@ -62,13 +65,13 @@ export async function enableNotifications(publicKey: string) {
 		});
 	}
 	await save(subscription);
-}
-export async function restoreNotifications() {
+};
+export const restoreNotifications = async () => {
 	const subscription = await notificationSubscription();
 	if (subscription && (await notificationSettings()).publicKey) await save(subscription);
 	return Boolean(subscription);
-}
-export async function disableNotifications() {
+};
+export const disableNotifications = async () => {
 	const subscription = await notificationSubscription();
 	if (!subscription) return;
 	try {
@@ -76,4 +79,4 @@ export async function disableNotifications() {
 	} finally {
 		await subscription.unsubscribe();
 	}
-}
+};

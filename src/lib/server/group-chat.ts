@@ -3,23 +3,22 @@ import { connect } from '#lib/mongoose/connect.js';
 import { LiveSignal } from './live-signal.js';
 import type { ChatMessage, MessageCursor, MessagePage } from '#lib/types/messages.js';
 import type { PublicUser } from './session.js';
-
 export const groupSignal = new LiveSignal();
 let cached: MessagePage | null = null;
 let cachedAt = 0;
 let loading: Promise<MessagePage> | null = null;
-export function invalidateGroup() {
+export const invalidateGroup = () => {
 	cachedAt = 0;
 	groupSignal.notify();
-}
-export function serializeMessage(row: {
+};
+export const serializeMessage = (row: {
 	_id: unknown;
+	clientId: string;
+	createdAt: Date;
 	senderId: unknown;
 	senderName: string;
 	text: string;
-	createdAt: Date;
-	clientId: string;
-}): ChatMessage {
+}): ChatMessage => {
 	return {
 		id: String(row._id),
 		senderId: String(row.senderId),
@@ -28,11 +27,14 @@ export function serializeMessage(row: {
 		createdAt: row.createdAt.toISOString(),
 		clientId: row.clientId
 	};
-}
-export async function saveGroupMessage(
+};
+export const saveGroupMessage = async (
 	user: PublicUser,
-	input: { text: string; clientId: string }
-) {
+	input: {
+		clientId: string;
+		text: string;
+	}
+) => {
 	await connect();
 	await Message.init();
 	const identity = { senderId: user._id, clientId: input.clientId };
@@ -53,8 +55,8 @@ export async function saveGroupMessage(
 	if (!row) throw new Error('Could not save your message.');
 	invalidateGroup();
 	return serializeMessage(row);
-}
-export async function readMessages(before?: MessageCursor): Promise<MessagePage> {
+};
+export const readMessages = async (before?: MessageCursor): Promise<MessagePage> => {
 	await connect();
 	const filter = before
 		? {
@@ -71,8 +73,8 @@ export async function readMessages(before?: MessageCursor): Promise<MessagePage>
 		.limit(51)
 		.lean();
 	return { messages: rows.slice(0, 50).reverse().map(serializeMessage), hasMore: rows.length > 50 };
-}
-export async function latestMessages(): Promise<MessagePage> {
+};
+export const latestMessages = async (): Promise<MessagePage> => {
 	if (cached && Date.now() - cachedAt < 4000) return cached;
 	if (loading) return loading;
 	const revision = groupSignal.revision;
@@ -86,4 +88,4 @@ export async function latestMessages(): Promise<MessagePage> {
 			loading = null;
 		});
 	return loading;
-}
+};

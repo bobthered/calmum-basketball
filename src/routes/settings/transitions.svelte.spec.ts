@@ -3,7 +3,6 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
 import { createRawSnippet } from 'svelte';
 import type { OnNavigate } from '$app/navigation';
-
 const mocks = vi.hoisted(() => ({ onNavigate: vi.fn() }));
 vi.mock('$app/navigation', () => ({
 	onNavigate: mocks.onNavigate,
@@ -13,28 +12,25 @@ vi.mock('$app/navigation', () => ({
 vi.mock('$app/state', () => ({ page: { url: new URL('https://basketball.example/settings') } }));
 import Layout from './+layout.svelte';
 import '../../app.css';
-
 afterEach(() => {
 	cleanup();
 	vi.restoreAllMocks();
 	mocks.onNavigate.mockClear();
 	delete document.documentElement.dataset.settingsDirection;
 });
-
-function mount() {
+const mount = () => {
 	render(Layout, {
 		children: createRawSnippet(() => ({ render: () => '<p>Settings content</p>' }))
 	});
 	return mocks.onNavigate.mock.calls[0][0] as (navigation: OnNavigate) => Promise<void> | undefined;
-}
-function navigation(from: string, to: string) {
+};
+const navigation = (from: string, to: string) => {
 	return {
 		from: { url: new URL(from, 'https://basketball.example') },
 		to: { url: new URL(to, 'https://basketball.example') },
 		complete: Promise.resolve()
 	} as OnNavigate;
-}
-
+};
 it('slides mobile settings pages in from the right and out to the right when returning', async () => {
 	await page.viewport(390, 844);
 	const callback = mount();
@@ -78,7 +74,6 @@ it('slides mobile settings pages in from the right and out to the right when ret
 	).toBe('2');
 	await transition.finished;
 });
-
 it('skips animations on desktop, outside Settings, and when reduced motion is enabled', async () => {
 	await page.viewport(1100, 900);
 	const callback = mount();

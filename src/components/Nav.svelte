@@ -1,10 +1,12 @@
 <script lang="ts">
+	// Imports
 	import { type Snippet } from 'svelte';
-	import { Nav as WindNav } from 'sveltewind/components';
 	import { type Attachment } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { Nav as WindNav } from 'sveltewind/components';
 	import { twMerge } from 'tailwind-merge';
 
+	// Types
 	type Props = Omit<HTMLAttributes<HTMLElement>, 'class' | 'style'> & {
 		attachments?: Attachment[];
 		children?: Snippet;
@@ -14,6 +16,8 @@
 		style?: string;
 		variants?: string[];
 	};
+
+	// $props
 	let {
 		attachments = $bindable([]),
 		children,

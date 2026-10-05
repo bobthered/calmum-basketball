@@ -1,27 +1,31 @@
 <script lang="ts">
+	// Imports
 	import { Field, Label } from '#components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';
 
+	// Types
 	type Props = {
 		attachments?: Attachment[];
 		children?: Snippet;
 		class?: string;
 		element?: null;
-		label?: string;
 		for?: string;
+		label?: string;
 		labelSnippet?: Snippet;
 		style?: string;
 		variants?: string[];
 	};
+
+	// $props
 	let {
 		attachments = $bindable([]),
 		children,
 		class: className,
 		element = $bindable(null),
-		label,
 		for: htmlFor,
+		label,
 		labelSnippet,
 		style,
 		variants = [],

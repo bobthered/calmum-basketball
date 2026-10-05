@@ -1,9 +1,16 @@
 <script lang="ts">
+	// Imports
+	import { A, Div } from '#components';
 	import { onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { A } from '#components';
+
+	// $props
 	let { children } = $props();
+
+	// $state
 	let activeTransition: ViewTransition | undefined;
+
+	// $effects
 	onNavigate((navigation) => {
 		const from = navigation.from?.url.pathname;
 		const to = navigation.to?.url.pathname;
@@ -35,20 +42,20 @@
 	});
 </script>
 
-<div
+<Div
 	class="admin-page flex w-full grow flex-col bg-gray-50 p-4 pt-[calc(env(safe-area-inset-top)+1rem)] lg:grow-0 lg:p-0 dark:bg-gray-950"
 >
-	<div class="flex w-full min-w-0 flex-col gap-6">
+	<Div class="flex w-full min-w-0 flex-col gap-6">
 		{#if page.url.pathname !== '/admin'}
 			<A href="/admin" variants={['button.base']} class="self-start">Back to Admin</A>
 		{/if}
 		{@render children()}
-	</div>
-</div>
+	</Div>
+</Div>
 
 <style>
 	@media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
-		.admin-page {
+		:global(.admin-page) {
 			view-transition-name: admin-page;
 		}
 	}

@@ -41,7 +41,7 @@ afterEach(() => {
 	user.value = null;
 	vi.clearAllMocks();
 });
-function openChat() {
+const openChat = () => {
 	user.value = {
 		_id: 'viewer',
 		firstName: 'Viewer',
@@ -50,7 +50,7 @@ function openChat() {
 		isAdmin: false
 	};
 	render(Page);
-}
+};
 describe('group chat', () => {
 	it('renders message text safely and sends a message from the composer', async () => {
 		mocks.send.mockResolvedValue({

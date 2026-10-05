@@ -1,23 +1,20 @@
 <script lang="ts">
+	// Imports
 	import { Dialog } from '#components';
 	import type { Snippet } from 'svelte';
 	import type { HTMLDialogAttributes } from 'svelte/elements';
 
+	// Types
 	type Props = Omit<HTMLDialogAttributes, 'open' | 'class'> & {
-		class?: string;
 		children?: Snippet;
-		snippet?: Snippet;
-		isOpen?: boolean;
+		class?: string;
 		dismissible?: boolean;
+		isOpen?: boolean;
+		snippet?: Snippet;
 	};
-	let {
-		children,
-		snippet,
-		isOpen = $bindable(false),
-		dismissible = false,
-		...restProps
-	}: Props = $props();
-	function preserveRequiredChoice(node: HTMLDialogElement) {
+
+	// Helper functions
+	const preserveRequiredChoice = (node: HTMLDialogElement) => {
 		const cancel = (event: Event) => {
 			if (!dismissible) {
 				event.preventDefault();
@@ -28,7 +25,16 @@
 		// loading, and notification dialogs that require an explicit action.
 		node.addEventListener('cancel', cancel, { capture: true });
 		return () => node.removeEventListener('cancel', cancel, { capture: true });
-	}
+	};
+
+	// $props
+	let {
+		children,
+		dismissible = false,
+		isOpen = $bindable(false),
+		snippet,
+		...restProps
+	}: Props = $props();
 </script>
 
 <Dialog {...restProps} bind:isVisible={isOpen} {@attach preserveRequiredChoice}>

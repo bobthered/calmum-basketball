@@ -1,11 +1,19 @@
-<script>
-	import { Card, Form, FormControl, Input, SubmitButton } from '#components';
+<script lang="ts">
+	// Imports
+	import { Card, Form, FormControl, H2, Input, P, SubmitButton } from '#components';
 	import { updateUser } from '#lib/remote/update-user.remote.js';
 	import { user } from '#lib/state/index.js';
+
+	// $state
 	let isPending = $state(false);
-	let saveMessage = $state('');
+
 	let saveError = $state('');
+
+	let saveMessage = $state('');
+
 	let tempUser = $state({ _id: '', firstName: '', isAdmin: false, lastName: '', username: '' });
+
+	// $effects
 	$effect(() => {
 		if (user.value) tempUser = $state.snapshot(user.value);
 	});
@@ -14,8 +22,8 @@
 <svelte:head><title>Personal information | Cal-Mum Rec. Basketball</title></svelte:head>
 {#if user.value}
 	<Card class="gap-4">
-		<h2 class="text-xl font-semibold">Personal information</h2>
-		<p class="text-sm text-gray-600 dark:text-gray-400">Update the name other players see.</p>
+		<H2 class="text-xl font-semibold">Personal information</H2>
+		<P class="text-sm text-gray-600 dark:text-gray-400">Update the name other players see.</P>
 		<Form
 			class="flex flex-col space-y-6"
 			{...updateUser.enhance(async ({ submit }) => {
@@ -61,10 +69,10 @@
 					required={true}
 				/>
 			</FormControl>
-			{#if saveMessage}<p role="status" class="text-sm">{saveMessage}</p>{/if}
-			{#if saveError}<p role="alert" class="text-sm text-red-600 dark:text-red-400">
+			{#if saveMessage}<P role="status" class="text-sm">{saveMessage}</P>{/if}
+			{#if saveError}<P role="alert" class="text-sm text-red-600 dark:text-red-400">
 					{saveError}
-				</p>{/if}
+				</P>{/if}
 			<SubmitButton bind:isPending class="ml-auto">Save changes</SubmitButton>
 		</Form>
 	</Card>

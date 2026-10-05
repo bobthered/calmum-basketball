@@ -5,11 +5,11 @@ export class LiveSignal {
 	get listenerCount() {
 		return this.listeners.size;
 	}
-	notify() {
+	notify = () => {
 		this.revision++;
 		for (const listener of [...this.listeners]) listener();
-	}
-	wait(revision: number, signal: AbortSignal, milliseconds = 5000): Promise<void> {
+	};
+	wait = (revision: number, signal: AbortSignal, milliseconds = 5000): Promise<void> => {
 		if (signal.aborted || revision !== this.revision) return Promise.resolve();
 		return new Promise((resolve) => {
 			const finish = () => {
@@ -23,5 +23,5 @@ export class LiveSignal {
 			signal.addEventListener('abort', finish, { once: true });
 			if (signal.aborted || revision !== this.revision) finish();
 		});
-	}
+	};
 }

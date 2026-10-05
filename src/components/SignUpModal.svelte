@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { onMount, untrack, type Snippet } from 'svelte';
-	import { type Attachment } from 'svelte/attachments';
-	import type { HTMLAttributes } from 'svelte/elements';
-	import { browser } from '$app/env';
+	// Imports
 	import {
 		BasketballIcon,
 		Button,
@@ -14,12 +11,17 @@
 		Modal,
 		SubmitButton
 	} from '#components';
-	import { slide } from '#lib/transition/index.js';
 	import { currentSession, migrateLegacyLogin } from '#lib/remote/session.remote.js';
+	import { signIn } from '#lib/remote/sign-in.remote.js';
 	import { signUp } from '#lib/remote/sign-up.remote.js';
 	import { user } from '#lib/state/user/index.js';
-	import { signIn } from '#lib/remote/sign-in.remote.js';
+	import { slide } from '#lib/transition/index.js';
+	import { browser } from '$app/env';
+	import { onMount, type Snippet, untrack } from 'svelte';
+	import { type Attachment } from 'svelte/attachments';
+	import type { HTMLAttributes } from 'svelte/elements';
 
+	// Types
 	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {
 		attachments?: Attachment[];
 		children?: Snippet;
@@ -28,6 +30,8 @@
 		style?: string;
 		variants?: string[];
 	};
+
+	// $props
 	let {
 		attachments = $bindable([]),
 		children,
@@ -40,15 +44,24 @@
 
 	// $state
 	let errorMessage: string | null = $state(null);
-	let formDisplay: 'Sign In' | 'Sign Up' = $state('Sign Up');
-	let isOpen = $state(false);
-	let restored = $state(false);
-	let isPending = $state(false);
+
 	let firstName = $state('');
+
+	let formDisplay: 'Sign In' | 'Sign Up' = $state('Sign Up');
+
+	let isOpen = $state(false);
+
+	let isPending = $state(false);
+
 	let lastName = $state('');
+
 	let password = $state('');
+
+	let restored = $state(false);
+
 	let username = $state('');
 
+	// $effects
 	onMount(() => {
 		void (async () => {
 			try {
@@ -69,9 +82,11 @@
 			}
 		})();
 	});
+
 	$effect(() => {
 		if (restored && browser && !user.value) isOpen = true;
 	});
+
 	$effect(() => {
 		const firstNameValue = firstName;
 		const lastNameValue = lastName;
@@ -131,9 +146,9 @@
 			</FormControl>
 		</Div>
 		{#if errorMessage}
-			<div class="px-4 text-red-500" transition:slide={{ axis: 'y', duration: 200 }}>
+			<Div class="px-4 text-red-500" transition={[slide, { axis: 'y', duration: 200 }]}>
 				{errorMessage}
-			</div>
+			</Div>
 		{/if}
 		<Div class="flex flex-col px-4">
 			<SubmitButton bind:isPending class="">Sign In</SubmitButton>
@@ -209,9 +224,9 @@
 			</FormControl>
 		</Div>
 		{#if errorMessage}
-			<div class="px-4 text-red-500" transition:slide={{ axis: 'y', duration: 200 }}>
+			<Div class="px-4 text-red-500" transition={[slide, { axis: 'y', duration: 200 }]}>
 				{errorMessage}
-			</div>
+			</Div>
 		{/if}
 		<Div class="flex flex-col px-4">
 			<SubmitButton bind:isPending class="">Sign Up</SubmitButton>

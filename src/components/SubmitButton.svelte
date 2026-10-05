@@ -1,8 +1,10 @@
 <script lang="ts">
+	// Imports
 	import { Button, Div, Spinner } from '#components';
 	import { type Snippet } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
 
+	// Types
 	type Props = {
 		children?: Snippet;
 		class?: string;
@@ -10,6 +12,8 @@
 		isPending: boolean;
 		style?: string;
 	};
+
+	// $props
 	let {
 		children,
 		class: className,

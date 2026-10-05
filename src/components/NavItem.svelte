@@ -1,12 +1,19 @@
 <script lang="ts">
-	import { page } from '$app/state';
+	// Imports
 	import { A, Button, Div } from '#components';
+	import { isActiveRoute } from '#lib/ui/navigation.js';
+	import { page } from '$app/state';
 	import { type Component, type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';
-	import { isActiveRoute } from '#lib/ui/navigation.js';
 
-	type AnchorProps = BaseProps & { element?: HTMLAnchorElement | null; href: string; tag?: 'a' };
+	// Types
+	type AnchorProps = BaseProps & {
+		element?: HTMLAnchorElement | null;
+		href: string;
+		tag?: 'a';
+	};
+
 	type BaseProps = {
 		active?: boolean;
 		attachments?: Attachment[];
@@ -17,12 +24,16 @@
 		style?: string | null;
 		variants?: string[];
 	};
+
 	type ButtonProps = BaseProps & {
 		element?: HTMLButtonElement | null;
 		onclick?: import('svelte/elements').HTMLButtonAttributes['onclick'];
 		tag: 'button';
 	};
+
 	type Props = AnchorProps | ButtonProps;
+
+	// $props
 	let {
 		active,
 		attachments = $bindable([]),
@@ -41,8 +52,10 @@
 		if ('href' in restProps) return restProps.href;
 		return '';
 	});
-	const tag = $derived.by(() => restProps?.tag ?? 'a');
+
 	const isActive = $derived(active ?? (href !== '' && isActiveRoute(page.url.pathname, href)));
+
+	const tag = $derived.by(() => restProps?.tag ?? 'a');
 </script>
 
 {#if tag === 'a' && 'href' in restProps}

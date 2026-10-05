@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	// Imports
 	import NotificationPreferences from '#components/NotificationPreferences.svelte';
 	import { user } from '#lib/state/index.js';
 </script>
