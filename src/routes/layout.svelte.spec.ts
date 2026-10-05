@@ -10,7 +10,8 @@ const account = vi.hoisted(() => ({
 	username: 'admin',
 	isAdmin: true
 }));
-vi.mock('$app/state', () => ({ page: { url: new URL('https://basketball.example/') } }));
+const route = vi.hoisted(() => ({ url: new URL('https://basketball.example/') }));
+vi.mock('$app/state', () => ({ page: route }));
 vi.mock('#lib/remote/session.remote.js', () => ({
 	currentSession: async () => account,
 	migrateLegacyLogin: vi.fn(),
@@ -36,6 +37,59 @@ afterEach(() => {
 	cleanup();
 	user.value = null;
 	scheduledDates.value = [];
+	route.url = new URL('https://basketball.example/');
+});
+
+it.each([
+	'/settings',
+	'/settings/personal-information',
+	'/settings/notification',
+	'/settings/delete-account'
+])('highlights Settings on mobile and desktop for %s', async (path) => {
+	route.url = new URL(path, 'https://basketball.example');
+	user.value = account;
+	await page.viewport(390, 844);
+	render(Layout);
+	const mobile = page.getByRole('link', { name: 'Settings', exact: true });
+	await expect.element(mobile).toHaveAttribute('aria-current', 'page');
+	await expect.element(mobile).toHaveClass('font-semibold');
+	await expect
+		.element(page.getByRole('link', { name: 'Home', exact: true }))
+		.not.toHaveAttribute('aria-current');
+	await page.viewport(1100, 900);
+	await page.getByRole('button', { name: 'Open navigation' }).click();
+	const desktop = page.getByRole('navigation', { name: 'Desktop navigation' });
+	await expect
+		.element(desktop.getByRole('link', { name: 'Settings', exact: true }))
+		.toHaveAttribute('aria-current', 'page');
+	await expect
+		.element(desktop.getByRole('link', { name: 'Settings', exact: true }))
+		.toHaveClass('font-semibold');
+	await expect
+		.element(desktop.getByRole('link', { name: 'Home', exact: true }))
+		.not.toHaveAttribute('aria-current');
+});
+
+it('highlights the admin section and its selected link in both navigation layouts', async () => {
+	route.url = new URL('https://basketball.example/admin/users');
+	user.value = account;
+	await page.viewport(390, 844);
+	render(Layout);
+	const admin = page.getByRole('button', { name: 'Admin', exact: true });
+	await expect.element(admin).toHaveAttribute('aria-current', 'location');
+	await admin.click();
+	await expect
+		.element(page.getByRole('link', { name: 'Users', exact: true }))
+		.toHaveAttribute('aria-current', 'page');
+	await page.viewport(1100, 900);
+	await page.getByRole('button', { name: 'Open navigation' }).click();
+	await expect
+		.element(
+			page
+				.getByRole('navigation', { name: 'Desktop navigation' })
+				.getByRole('link', { name: 'Users', exact: true })
+		)
+		.toHaveAttribute('aria-current', 'page');
 });
 
 it('opens and closes the SvelteWind admin popover using the complete trigger attributes', async () => {

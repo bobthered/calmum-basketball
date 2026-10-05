@@ -2,6 +2,7 @@
 	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, Users, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { page } from '$app/state';
+	import { isActiveRoute } from '#lib/ui/navigation.js';
 	import {
 		BasketballIcon,
 		A,
@@ -49,6 +50,14 @@
 		{ href: '/messages', Icon: MessageCircle, label: 'Chat' },
 		{ href: '/settings', Icon: Settings, label: 'Settings' }
 	]);
+	function desktopLinkClass(href: string) {
+		return twMerge(
+			'flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50',
+			isActiveRoute(page.url.pathname, href)
+				? 'bg-primary-50 font-semibold text-primary-800 ring-1 ring-primary-200 hover:bg-primary-100 hover:text-primary-800 focus:text-primary-800 dark:bg-gray-800 dark:text-primary-200 dark:ring-gray-700 dark:hover:text-primary-200 dark:focus:text-primary-200'
+				: ''
+		);
+	}
 
 	const updateScheduledDates = async () => {
 		calendarError = '';
@@ -132,6 +141,7 @@
 									isAdminPopoverOpen ? 'bg-primary-800 lg:bg-white' : undefined
 								)}
 								Icon={ShieldUser}
+								active={isActiveRoute(page.url.pathname, '/admin')}
 								label="Admin"
 								tag="button"
 							/>
@@ -144,8 +154,14 @@
 						>
 							{#each adminNav as { href, Icon, label }}
 								<a
-									class="flex items-center space-x-2 px-6 py-3"
+									class={twMerge(
+										'flex items-center space-x-2 px-6 py-3',
+										isActiveRoute(page.url.pathname, href)
+											? 'bg-primary-700 font-semibold text-white'
+											: ''
+									)}
 									{href}
+									aria-current={isActiveRoute(page.url.pathname, href) ? 'page' : undefined}
 									title={label}
 									onclick={() => (isAdminPopoverOpen = false)}
 								>
@@ -184,7 +200,8 @@
 									<A
 										{href}
 										variants={['ghost']}
-										class="flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50"
+										class={desktopLinkClass(href)}
+										aria-current={isActiveRoute(page.url.pathname, href) ? 'page' : undefined}
 										onclick={() => (isDesktopMenuOpen = false)}
 										><Icon class="size-5 shrink-0" />{label}</A
 									>
@@ -197,7 +214,8 @@
 										<A
 											{href}
 											variants={['ghost']}
-											class="flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50"
+											class={desktopLinkClass(href)}
+											aria-current={isActiveRoute(page.url.pathname, href) ? 'page' : undefined}
 											onclick={() => (isDesktopMenuOpen = false)}
 											><Icon class="size-5 shrink-0" />{label}</A
 										>
