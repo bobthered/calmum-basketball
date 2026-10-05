@@ -1,53 +1,37 @@
 <script lang="ts">
-	import { Card } from '#components';
-	import { fade } from '#lib/transition/index.js';
-	import { type Snippet } from 'svelte';
-	import { type Attachment } from 'svelte/attachments';
-	import type { HTMLAttributes } from 'svelte/elements';
-	import { twMerge } from 'tailwind-merge';
+	import { Dialog } from '#components';
+	import type { Snippet } from 'svelte';
+	import type { HTMLDialogAttributes } from 'svelte/elements';
 
-	type Props = Omit<HTMLAttributes<HTMLDivElement>, 'class' | 'style'> & {
-		attachments?: Attachment[];
-		children?: Snippet;
+	type Props = Omit<HTMLDialogAttributes, 'open' | 'class'> & {
 		class?: string;
-		element?: HTMLDivElement | null;
-		isOpen?: boolean;
+		children?: Snippet;
 		snippet?: Snippet;
-		style?: string;
-		variants?: string[];
+		isOpen?: boolean;
+		dismissible?: boolean;
 	};
 	let {
-		attachments = $bindable([]),
 		children,
-		class: className,
-		element = $bindable(null),
-		isOpen = $bindable(false),
 		snippet,
-		style,
-		variants = [],
+		isOpen = $bindable(false),
+		dismissible = false,
 		...restProps
 	}: Props = $props();
+	function preserveRequiredChoice(node: HTMLDialogElement) {
+		const cancel = (event: Event) => {
+			if (!dismissible) {
+				event.preventDefault();
+				event.stopImmediatePropagation();
+			}
+		};
+		// SvelteWind's Dialog handles Escape internally. Intercept it for login,
+		// loading, and notification dialogs that require an explicit action.
+		node.addEventListener('cancel', cancel, { capture: true });
+		return () => node.removeEventListener('cancel', cancel, { capture: true });
+	}
 </script>
 
-{#if isOpen}
-	<div
-		{...restProps}
-		bind:this={element}
-		class={twMerge(
-			'fixed top-0 left-0 flex h-dvh w-dvw flex-col overflow-auto bg-white/70 p-4 backdrop-blur dark:bg-black/70',
-			className
-		)}
-		{style}
-		transition:fade={{ duration: 200 }}
-	>
-		{#if snippet}
-			{@render snippet()}
-		{:else}
-			<Card class="mx-auto my-auto flex w-full max-w-sm flex-col overflow-auto">
-				{#if children}
-					{@render children()}
-				{/if}
-			</Card>
-		{/if}
-	</div>
-{/if}
+<Dialog {...restProps} bind:isVisible={isOpen} {@attach preserveRequiredChoice}>
+	{#if snippet}{@render snippet()}
+	{:else if children}{@render children()}{/if}
+</Dialog>

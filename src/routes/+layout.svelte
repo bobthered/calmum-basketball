@@ -3,13 +3,17 @@
 		Calendar,
 		CircleUserRound,
 		LogOut,
+		Menu,
 		MessageCircle,
 		ShieldUser,
-		Users
+		Users,
+		X
 	} from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
+		A,
+		Button,
 		Card,
 		Div,
 		H1,
@@ -27,6 +31,7 @@
 	import { scheduledDates, user } from '#lib/state/index.js';
 	import { signOut as endSession } from '#lib/remote/session.remote.js';
 	import { disableNotifications } from '#lib/notifications.js';
+	import { subtleReveal } from 'sveltewind/transitions';
 	import '../app.css';
 
 	let { children } = $props();
@@ -37,6 +42,15 @@
 		{ href: '/admin/users', Icon: Users, label: 'Users' }
 	]);
 	let isAdminPopoverOpen = $state(false);
+	let isDesktopMenuOpen = $state(false);
+	let menuButton: HTMLButtonElement | null = $state(null);
+	function closeOutsideMenu(node: HTMLElement) {
+		const close = (event: PointerEvent) => {
+			if (isDesktopMenuOpen && !node.contains(event.target as Node)) isDesktopMenuOpen = false;
+		};
+		document.addEventListener('pointerdown', close, true);
+		return () => document.removeEventListener('pointerdown', close, true);
+	}
 	let isScheduledDateInitiated = $state(false);
 	let calendarError = $state('');
 	let nav = $state([
@@ -82,6 +96,19 @@
 	});
 </script>
 
+<svelte:window
+	onkeydown={(event) => {
+		if (event.key === 'Escape' && isDesktopMenuOpen) {
+			isDesktopMenuOpen = false;
+			menuButton?.focus();
+		}
+	}}
+	onresize={() => {
+		if (window.innerWidth < 1024) isDesktopMenuOpen = false;
+		else isAdminPopoverOpen = false;
+	}}
+/>
+
 <svelte:head>
 	<link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
 	<link rel="alternate icon" href="/icons/icon-16x16.png" />
@@ -106,27 +133,27 @@
 	{/if}
 </Main>
 {#if user.value !== null}
-	<Header class="z-2 bg-primary-700 text-white">
-		<Div class="jusity-between mx-auto flex w-full max-w-7xl items-center lg:px-4">
-			<Div class="hidden items-center space-x-4 lg:flex">
-				<BasketballIcon class="h-16 w-16" />
-				<H1 class="text-3xl whitespace-nowrap">Cal-Mum Rec. Basketball</H1>
+	<Header class="relative z-2 bg-primary-700 text-white">
+		<Div class="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 lg:px-4">
+			<Div class="hidden min-w-0 items-center gap-4 lg:flex">
+				<BasketballIcon class="h-16 w-16 shrink-0" />
+				<H1 class="truncate text-3xl sm:text-3xl">Cal-Mum Rec. Basketball</H1>
 			</Div>
-			<Nav {navItemCount}>
+			<Nav {navItemCount} class="lg:hidden">
 				{#each nav as { href, Icon, label }}
 					<NavItem {href} {Icon} {label} />
 				{/each}
 				{#if user.value.isAdmin}
-					<Popover bind:isOpen={isAdminPopoverOpen} class="flex flex-col items-center">
-						{#snippet triggerSnippet()}
+					<Popover bind:isVisible={isAdminPopoverOpen} placement="top" class="p-0">
+						{#snippet trigger(triggerProps)}
 							<NavItem
+								{...triggerProps}
 								class={twMerge(
 									'w-full',
 									isAdminPopoverOpen ? 'bg-primary-800 lg:bg-white' : undefined
 								)}
 								Icon={ShieldUser}
 								label="Admin"
-								onclick={() => (isAdminPopoverOpen = !isAdminPopoverOpen)}
 								tag="button"
 							/>
 						{/snippet}
@@ -137,7 +164,12 @@
 							)}
 						>
 							{#each adminNav as { href, Icon, label }}
-								<a class="flex items-center space-x-2 px-6 py-3" {href} title={label}>
+								<a
+									class="flex items-center space-x-2 px-6 py-3"
+									{href}
+									title={label}
+									onclick={() => (isAdminPopoverOpen = false)}
+								>
 									<Icon class="lg:hidden" />
 									<Div>
 										{label}
@@ -149,6 +181,64 @@
 				{/if}
 				<NavItem Icon={LogOut} label="Sign Out" onclick={() => signOut()} tag="button" />
 			</Nav>
+			<Div class="relative hidden shrink-0 lg:block" {@attach closeOutsideMenu}>
+				<Button
+					class="hidden shrink-0 bg-primary-700 p-3 text-white hover:bg-primary-800 lg:flex"
+					type="button"
+					bind:element={menuButton}
+					aria-label={isDesktopMenuOpen ? 'Close navigation' : 'Open navigation'}
+					aria-expanded={isDesktopMenuOpen}
+					aria-controls="desktop-navigation"
+					onclick={() => (isDesktopMenuOpen = !isDesktopMenuOpen)}
+					>{#if isDesktopMenuOpen}<X aria-hidden="true" />{:else}<Menu
+							aria-hidden="true"
+						/>{/if}</Button
+				>
+				{#if isDesktopMenuOpen}
+					<div
+						id="desktop-navigation"
+						class="absolute top-full right-0 mt-4 hidden w-80 max-w-[calc(100vw-2rem)] origin-top-right lg:block"
+						transition:subtleReveal={{ duration: 200 }}
+					>
+						<Card class="max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-t-none shadow-lg">
+							<nav aria-label="Desktop navigation" class="flex flex-col gap-2">
+								{#each nav as { href, Icon, label } (href)}
+									<A
+										{href}
+										variants={['ghost']}
+										class="flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50"
+										onclick={() => (isDesktopMenuOpen = false)}
+										><Icon class="size-5 shrink-0" />{label}</A
+									>
+								{/each}
+								{#if user.value.isAdmin}
+									<h3 class="mt-3 px-3 text-sm font-semibold text-gray-600 dark:text-gray-400">
+										Administration
+									</h3>
+									{#each adminNav as { href, Icon, label } (href)}
+										<A
+											{href}
+											variants={['ghost']}
+											class="flex items-center gap-3 rounded p-3 text-gray-950 hover:bg-gray-100 hover:text-gray-950 focus:text-gray-950 dark:text-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:text-gray-50"
+											onclick={() => (isDesktopMenuOpen = false)}
+											><Icon class="size-5 shrink-0" />{label}</A
+										>
+									{/each}
+								{/if}
+								<Button
+									type="button"
+									variants={['ghost']}
+									class="mt-3 flex items-center gap-3 p-3 text-left"
+									onclick={() => {
+										isDesktopMenuOpen = false;
+										void signOut();
+									}}><LogOut class="size-5" />Sign Out</Button
+								>
+							</nav>
+						</Card>
+					</div>
+				{/if}
+			</Div>
 		</Div>
 	</Header>
 {/if}

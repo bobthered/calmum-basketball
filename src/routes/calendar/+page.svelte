@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FormControl, H1, RadioGroup, RadioInput } from '#components';
+	import { Card, FormControl, H1, Label, Radio } from '#components';
 	import Calendar from './Calendar.svelte';
 	import List from './List.svelte';
 
@@ -13,11 +13,13 @@
 
 <H1>Calendar</H1>
 <FormControl label="View">
-	<RadioGroup class="self-start">
+	<Card class="flex-row gap-4 self-start p-2">
 		{#each views as value}
-			<RadioInput bind:group={view} {value} />
+			<Label class="flex cursor-pointer items-center gap-2"
+				><Radio bind:group={view} {value} name="calendar-view" />{value}</Label
+			>
 		{/each}
-	</RadioGroup>
+	</Card>
 </FormControl>
 {#if view === 'Month'}
 	<Calendar />

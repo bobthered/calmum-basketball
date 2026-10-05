@@ -1,4 +1,21 @@
 @import 'tailwindcss';
+@import 'sveltewind/themes/palettes.css';
+@source '../node_modules/sveltewind/dist';
+
+/* SvelteWind contrast tokens for the app's custom burgundy palette. */
+:root {
+	--primary-foreground-50: var(--color-gray-950);
+	--primary-foreground-100: var(--color-gray-950);
+	--primary-foreground-200: var(--color-gray-950);
+	--primary-foreground-300: var(--color-gray-950);
+	--primary-foreground-400: var(--color-gray-950);
+	--primary-foreground-500: var(--color-gray-50);
+	--primary-foreground-600: var(--color-gray-50);
+	--primary-foreground-700: var(--color-gray-50);
+	--primary-foreground-800: var(--color-gray-50);
+	--primary-foreground-900: var(--color-gray-50);
+	--primary-foreground-950: var(--color-gray-50);
+}
 
 @theme {
 	--color-primary-50: #fdf7f9;

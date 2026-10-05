@@ -1,26 +1,29 @@
 export { default as BasketballIcon } from './BasketballIcon.svelte';
-export { default as ButtonA } from './ButtonA.svelte';
-export { default as Button } from './Button.svelte';
-export { default as Card } from './Card.svelte';
-export { default as CheckboxInput } from './CheckboxInput.svelte';
-export { default as CheckboxInputHandle } from './CheckboxInputHandle.svelte';
-export { default as ColorInput } from './ColorInput.svelte';
-export { default as CopyButton } from './CopyButton.svelte';
-export { default as Div } from './Div.svelte';
-export { default as Form } from './Form.svelte';
+import '#lib/ui/theme.js';
+export {
+	A,
+	Button,
+	Card,
+	Checkbox,
+	Dialog,
+	Div,
+	Drawer,
+	Field,
+	Form,
+	H1,
+	H2,
+	Header,
+	Input,
+	Label,
+	Main,
+	Popover,
+	Radio,
+	Spinner,
+	Textarea
+} from 'sveltewind/components';
 export { default as FormControl } from './FormControl.svelte';
-export { default as H1 } from './H1.svelte';
-export { default as Header } from './Header.svelte';
-export { default as Input } from './Input.svelte';
-export { default as Label } from './Label.svelte';
-export { default as Main } from './Main.svelte';
 export { default as Modal } from './Modal.svelte';
 export { default as Nav } from './Nav.svelte';
 export { default as NavItem } from './NavItem.svelte';
-export { default as Popover } from './Popover.svelte';
-export { default as RadioGroup } from './RadioGroup.svelte';
-export { default as RadioInput } from './RadioInput.svelte';
-export { default as RadioInputHandle } from './RadioInputHandle.svelte';
 export { default as SignUpModal } from './SignUpModal.svelte';
-export { default as Spinner } from './Spinner.svelte';
 export { default as SubmitButton } from './SubmitButton.svelte';

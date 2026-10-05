@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Div, Label } from '#components';
+	import { Field, Label } from '#components';
 	import { type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import { twMerge } from 'tailwind-merge';
@@ -27,7 +27,7 @@
 	}: Props = $props();
 </script>
 
-<Div {...restProps} bind:element class={twMerge('flex flex-col', className)} {style}>
+<Field {...restProps} bind:element class={twMerge('flex flex-col', className)} {style}>
 	{#if labelSnippet}
 		{@render labelSnippet()}
 	{:else if label}
@@ -36,4 +36,4 @@
 	{#if children}
 		{@render children()}
 	{/if}
-</Div>
+</Field>

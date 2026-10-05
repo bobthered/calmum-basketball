@@ -7,4 +7,7 @@ export const userCalendarStatusSchema = new mongoose.Schema({
 	status: { type: String, enum: ['Yes', 'Maybe', 'No'], required: true }
 });
 
-export const UserCalendarStatus = mongoose.model('UserCalendarStatus', userCalendarStatusSchema);
+export const UserCalendarStatus =
+	(mongoose.models.UserCalendarStatus as
+		| mongoose.Model<mongoose.InferSchemaType<typeof userCalendarStatusSchema>>
+		| undefined) ?? mongoose.model('UserCalendarStatus', userCalendarStatusSchema);

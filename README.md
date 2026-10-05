@@ -5,8 +5,22 @@ and conversations among players. Users can view the basketball calendar,
 manage their account, and participate in a shared group chat. Administrators
 manage users and calendar entries. Direct messaging is planned for a later phase.
 
-Built with SvelteKit 3, Svelte 5, TypeScript, and Tailwind CSS. MongoDB stores
+Built with SvelteKit 3, Svelte 5, TypeScript, Tailwind CSS, and
+[SvelteWind](https://sveltewind.com). MongoDB stores
 application data through Mongoose, and Vercel hosts the app.
+
+## UI components
+
+Shared UI primitives come from `sveltewind/components`, re-exported through
+`src/components/index.ts`. The app's central theme in `src/lib/ui/theme.ts`
+extends SvelteWind's Classic preset. `src/app.css` includes SvelteWind's Tailwind
+sources and preserves the custom burgundy and gray palettes.
+
+App-specific components compose these primitives: mobile navigation, labeled
+form fields, pending submit buttons, and the login and notification flows.
+`Modal.svelte` wraps SvelteWind's native Dialog, preserving explicit-choice
+behavior for dialogs that must remain open until the user answers. The admin
+menu uses SvelteWind's native Popover with its complete trigger attributes.
 
 ## Local development
 

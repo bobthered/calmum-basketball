@@ -5,4 +5,7 @@ export const calendarSchema = new mongoose.Schema({
 	isScheduled: { type: Boolean, required: true }
 });
 
-export const Calendar = mongoose.model('Calendar', calendarSchema);
+export const Calendar =
+	(mongoose.models.Calendar as
+		| mongoose.Model<mongoose.InferSchemaType<typeof calendarSchema>>
+		| undefined) ?? mongoose.model('Calendar', calendarSchema);

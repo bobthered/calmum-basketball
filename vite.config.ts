@@ -6,6 +6,16 @@ import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
+	optimizeDeps: {
+		include: [
+			'@lucide/svelte',
+			'sveltewind/components',
+			'sveltewind/theme',
+			'sveltewind/themes',
+			'sveltewind/transitions',
+			'tailwind-merge'
+		]
+	},
 	plugins: [
 		tailwindcss(),
 		sveltekit({

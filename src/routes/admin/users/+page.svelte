@@ -5,7 +5,7 @@
 	import {
 		Button,
 		Card,
-		CheckboxInput,
+		Checkbox,
 		Div,
 		Form,
 		H1,
@@ -213,7 +213,11 @@
 		)}
 	>
 		{#if typeof object[key] === 'boolean'}
-			<CheckboxInput bind:checked={object[key]} onchange={() => onchange({ key, object })} />
+			<Checkbox
+				aria-label={`Administrator access for ${object.username}`}
+				bind:checked={object[key]}
+				onchange={() => onchange({ key, object })}
+			/>
 		{/if}
 	</Div>
 {/snippet}

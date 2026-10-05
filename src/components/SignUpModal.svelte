@@ -6,7 +6,6 @@
 	import {
 		BasketballIcon,
 		Button,
-		Card,
 		Div,
 		Form,
 		FormControl,
@@ -83,15 +82,11 @@
 </script>
 
 <Modal bind:isOpen>
-	{#snippet snippet()}
-		<Card class="mx-auto my-auto flex w-full max-w-sm flex-col overflow-auto p-0">
-			{#if formDisplay === 'Sign Up'}
-				{@render signUpSnippet()}
-			{:else}
-				{@render signInSnippet()}
-			{/if}
-		</Card>
-	{/snippet}
+	{#if formDisplay === 'Sign Up'}
+		{@render signUpSnippet()}
+	{:else}
+		{@render signInSnippet()}
+	{/if}
 </Modal>
 
 {#snippet signInSnippet()}
@@ -144,6 +139,7 @@
 			<SubmitButton bind:isPending class="">Sign In</SubmitButton>
 			<Div class="text-center">Or</Div>
 			<Button
+				type="button"
 				class="bg-gray-50 text-primary-700 shadow-sm dark:bg-gray-950"
 				onclick={() => {
 					errorMessage = null;
@@ -221,6 +217,7 @@
 			<SubmitButton bind:isPending class="">Sign Up</SubmitButton>
 			<Div class="text-center">Or</Div>
 			<Button
+				type="button"
 				class="bg-gray-50 text-primary-700 shadow-sm dark:bg-gray-950"
 				onclick={() => {
 					errorMessage = null;

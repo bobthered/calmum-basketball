@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Button, Card } from '#components';
+	import { Button, Card, Modal } from '#components';
 	import { notificationSettings } from '#lib/remote/notifications.remote.js';
 	import {
 		disableNotifications,
@@ -21,7 +21,7 @@
 	let publicKey = $state('');
 	let message = $state('');
 	let showPrompt = $state(false);
-	let dialog: HTMLDialogElement | undefined = $state();
+
 	const preferenceKey = () => `basketball:notifications:answered:${userId}`;
 	function hasAnswered() {
 		try {
@@ -81,9 +81,6 @@
 			window.removeEventListener('basketball-notification-preference', refresh);
 		};
 	});
-	$effect(() => {
-		if (showPrompt && dialog && !dialog.open) dialog.showModal();
-	});
 	async function toggle() {
 		busy = true;
 		message = '';
@@ -105,9 +102,8 @@
 
 {#if prompt}
 	{#if showPrompt}
-		<dialog
-			bind:this={dialog}
-			oncancel={(event) => event.preventDefault()}
+		<Modal
+			bind:isOpen={showPrompt}
 			aria-labelledby="notification-title"
 			aria-describedby="notification-description"
 			class="m-auto w-[calc(100%-2rem)] max-w-sm rounded-xl bg-white p-6 text-gray-900 shadow-xl backdrop:bg-black/60 dark:bg-gray-900 dark:text-white"
@@ -129,10 +125,10 @@
 			<div class="mt-6 flex flex-wrap justify-end gap-3">
 				<Button disabled={busy} onclick={() => answer('later')}>Not now</Button>
 				<Button disabled={busy} onclick={toggle} class="bg-primary-700 text-white"
-					>{busy ? 'Enabling…' : 'Enable notifications'}</Button
+					>{busy ? 'Enablingâ€¦' : 'Enable notifications'}</Button
 				>
 			</div>
-		</dialog>
+		</Modal>
 	{/if}
 {:else}
 	<Card class="flex flex-col gap-3 lg:mr-auto">
@@ -140,7 +136,7 @@
 		<p class="text-sm">
 			Get an alert on this device when another player posts a message, even when the app is closed.
 		</p>
-		{#if !ready}<p role="status">Checking notification settings…</p>
+		{#if !ready}<p role="status">Checking notification settingsâ€¦</p>
 		{:else if installNeeded}<p class="text-sm">
 				On iPhone or iPad, add this app to your Home Screen and open it there to enable
 				notifications.
@@ -158,7 +154,11 @@
 				Notifications are {enabled ? 'on' : 'off'} for this device.
 			</p>
 			<Button class="self-start bg-primary-700 text-white" disabled={busy} onclick={toggle}
-				>{busy ? 'Updating…' : enabled ? 'Turn off notifications' : 'Enable notifications'}</Button
+				>{busy
+					? 'Updatingâ€¦'
+					: enabled
+						? 'Turn off notifications'
+						: 'Enable notifications'}</Button
 			>
 		{/if}
 		{#if message}<p role="alert" class="text-sm text-red-600 dark:text-red-400">{message}</p>{/if}

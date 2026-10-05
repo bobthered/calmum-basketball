@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type Snippet } from 'svelte';
+	import { Nav as WindNav } from 'sveltewind/components';
 	import { type Attachment } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { twMerge } from 'tailwind-merge';
@@ -25,9 +26,9 @@
 	}: Props = $props();
 </script>
 
-<nav
+<WindNav
 	{...restProps}
-	bind:this={element}
+	bind:element
 	class={twMerge(
 		'grid w-full grid-cols-[repeat(var(--nav-item-count),minmax(0,1fr))] shadow-[-0px_-1px_0px_0px_var(--color-primary-500)] lg:flex lg:justify-end lg:space-x-4 lg:shadow-none',
 		className
@@ -37,4 +38,4 @@
 	{#if children}
 		{@render children()}
 	{/if}
-</nav>
+</WindNav>

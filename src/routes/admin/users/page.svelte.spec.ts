@@ -2,7 +2,7 @@ import { page } from 'vitest/browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
 
-const mocks = vi.hoisted(() => ({ submit: vi.fn() }));
+const mocks = vi.hoisted(() => ({ submit: vi.fn(), update: vi.fn() }));
 vi.mock('#lib/remote/find-users.remote.js', () => ({
 	findUsers: async () => [
 		{
@@ -14,7 +14,7 @@ vi.mock('#lib/remote/find-users.remote.js', () => ({
 		}
 	]
 }));
-vi.mock('#lib/remote/update-user-field.remote.js', () => ({ updateUserField: vi.fn() }));
+vi.mock('#lib/remote/update-user-field.remote.js', () => ({ updateUserField: mocks.update }));
 vi.mock('#lib/remote/delete-user.remote.js', () => ({
 	deleteUser: {
 		fields: { _id: { as: () => ({ name: '_id', type: 'hidden' }) } },
@@ -39,6 +39,11 @@ afterEach(() => {
 });
 
 describe('admin user deletion', () => {
+	it('saves administrator changes through the SvelteWind checkbox', async () => {
+		render(Page);
+		await page.getByRole('checkbox', { name: 'Administrator access for testplayer' }).click();
+		expect(mocks.update).toHaveBeenCalledExactlyOnceWith({ _id: 'test-user', isAdmin: true });
+	});
 	it('Cancel closes confirmation without submitting, while Delete submits the selected user', async () => {
 		render(Page);
 		await page.getByRole('button', { name: 'Delete testplayer', exact: true }).click();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick, untrack } from 'svelte';
-	import { Button, H1 } from '#components';
+	import { Button, Form, H1, Textarea } from '#components';
 	import {
 		groupMessages,
 		olderGroupMessages,
@@ -22,7 +22,7 @@
 	let historyError = $state('');
 	let pending: { text: string; clientId: string } | null = $state(null);
 	let scrollArea: HTMLDivElement;
-	let composer: HTMLTextAreaElement;
+	let composer: HTMLTextAreaElement | null = $state(null);
 	const messages = $derived(mergeMessages(history, received, sent));
 	const errorText = (err: unknown, fallback: string) =>
 		err instanceof Error ? err.message : fallback;
@@ -112,7 +112,7 @@
 	<div class="flex flex-wrap items-center justify-between gap-2">
 		<H1>Basketball Chat</H1>
 		<span class="text-sm text-gray-600 dark:text-gray-400" role="status">
-			{live.connected ? 'Live' : 'Reconnecting…'}
+			{live.connected ? 'Live' : 'Reconnectingâ€¦'}
 		</span>
 	</div>
 	<p class="text-sm text-gray-600 dark:text-gray-400">
@@ -130,10 +130,10 @@
 		aria-label="Group messages"
 	>
 		{#if hasMore}<Button class="mx-auto block" disabled={loadingOlder} onclick={loadOlder}
-				>{loadingOlder ? 'Loading…' : 'Load older messages'}</Button
+				>{loadingOlder ? 'Loadingâ€¦' : 'Load older messages'}</Button
 			>{/if}
 		{#if historyError}<p role="alert" class="text-red-600 dark:text-red-400">{historyError}</p>{/if}
-		{#if !initialized}<p role="status">Loading messages…</p>
+		{#if !initialized}<p role="status">Loading messagesâ€¦</p>
 		{:else if messages.length === 0}<p class="py-6 text-center text-gray-500">
 				No messages yet. Start the conversation!
 			</p>{/if}
@@ -157,26 +157,26 @@
 			</article>
 		{/each}
 	</div>
-	<form onsubmit={send} class="flex shrink-0 flex-col gap-2">
+	<Form onsubmit={send} class="flex shrink-0 flex-col gap-2">
 		<label for="group-message" class="sr-only">Message to the group</label>
-		<textarea
-			bind:this={composer}
+		<Textarea
+			bind:element={composer}
 			bind:value={text}
 			id="group-message"
-			rows="2"
-			maxlength="2000"
+			rows={2}
+			maxlength={2000}
 			disabled={sending}
-			placeholder="Message the group…"
+			placeholder="Message the groupâ€¦"
 			class="w-full resize-none rounded-lg border border-gray-300 bg-white p-3 focus:outline-primary-700 dark:border-gray-700 dark:bg-gray-900"
-		></textarea>
+		></Textarea>
 		<div class="flex items-center justify-between gap-3">
 			<span class="text-xs text-gray-500">{text.length}/2000</span>
 			<Button type="submit" class="bg-primary-700 text-white" disabled={sending || !text.trim()}
-				>{sending ? 'Sending…' : 'Send'}</Button
+				>{sending ? 'Sendingâ€¦' : 'Send'}</Button
 			>
 		</div>
 		{#if sendError}<p role="alert" class="text-sm text-red-600 dark:text-red-400">
 				{sendError}
 			</p>{/if}
-	</form>
+	</Form>
 </div>

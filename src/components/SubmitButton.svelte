@@ -26,6 +26,7 @@
 	class={twMerge('relative overflow-hidden', className)}
 	{style}
 	type="submit"
+	disabled={isPending}
 >
 	<Div
 		class={twMerge(

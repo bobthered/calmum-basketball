@@ -16,4 +16,7 @@ userSchema.pre('findOneAndDelete', async function (next) {
 	next();
 });
 
-export const User = mongoose.model('User', userSchema);
+export const User =
+	(mongoose.models.User as
+		| mongoose.Model<mongoose.InferSchemaType<typeof userSchema>>
+		| undefined) ?? mongoose.model('User', userSchema);
