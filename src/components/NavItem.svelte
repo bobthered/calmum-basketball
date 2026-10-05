@@ -52,7 +52,7 @@
 		class={twMerge(
 			'z-2 flex flex-col items-center bg-primary-700 px-0 pt-3 pb-[max(env(safe-area-inset-bottom),.75rem)] text-white/60 no-underline transition duration-200 hover:bg-primary-800 hover:text-white focus:text-white lg:rounded lg:px-6 lg:pb-3 lg:text-primary-700 dark:text-white/60',
 			isActive
-				? 'bg-primary-800 font-semibold text-white shadow-[inset_0_3px_0_0_var(--color-primary-300)] lg:bg-white lg:hover:bg-white dark:text-white'
+				? 'bg-primary-800 font-semibold text-white lg:bg-white lg:hover:bg-white dark:text-white'
 				: 'lg:bg-primary-200 lg:hover:bg-primary-100',
 			className
 		)}

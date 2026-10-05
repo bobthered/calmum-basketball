@@ -68,7 +68,11 @@ describe('/+page.svelte', () => {
 				.element(page.getByText('User B Guest 2', { exact: true }))
 				.not.toBeInTheDocument();
 			await expect
-				.element(page.getByText(`We currently have ${6 + guestCount} committed`, { exact: false }))
+				.element(
+					page
+						.getByRole('group', { name: 'Attendance summary' })
+						.getByText(String(6 + guestCount), { exact: true })
+				)
 				.toBeInTheDocument();
 		}
 	);
@@ -181,4 +185,79 @@ describe('/+page.svelte', () => {
 		await expect.element(page.getByText('Guests - 1', { exact: true })).toBeVisible();
 		expect(updateStatus).toHaveBeenCalledTimes(2);
 	});
+
+	it('keeps the summary and other players hidden until attendance saves successfully', async () => {
+		user.value = {
+			_id: 'viewer',
+			firstName: 'Viewer',
+			lastName: 'User',
+			username: 'viewer',
+			isAdmin: false
+		};
+		findStatus.mockResolvedValue({
+			success: true,
+			rows: [
+				{
+					_userId: { _id: 'other', firstName: 'Other', lastName: 'Player' },
+					status: 'Yes',
+					numberOfGuests: 2
+				}
+			]
+		});
+		let finish!: (value: { success: boolean }) => void;
+		updateStatus.mockReturnValueOnce(
+			new Promise((resolve) => {
+				finish = resolve;
+			})
+		);
+		render(Page);
+		await expect.element(page.getByRole('button', { name: 'Yes', exact: true })).toBeEnabled();
+		await expect
+			.element(page.getByRole('heading', { name: "Today's game" }))
+			.not.toBeInTheDocument();
+		await expect
+			.element(page.getByRole('heading', { name: "Who's coming" }))
+			.not.toBeInTheDocument();
+		await expect.element(page.getByText('Other Player', { exact: true })).not.toBeInTheDocument();
+		await page.getByRole('button', { name: 'Yes', exact: true }).click();
+		await expect
+			.element(page.getByRole('heading', { name: "Who's coming" }))
+			.not.toBeInTheDocument();
+		finish({ success: true });
+		await expect.element(page.getByRole('heading', { name: "Who's coming" })).toBeVisible();
+		await expect.element(page.getByText('Other Player', { exact: true })).toBeVisible();
+	});
+
+	it.each([390, 1440])(
+		'lays out attendance controls and details without overflow at %ipx',
+		async (width) => {
+			await page.viewport(width, 1000);
+			user.value = {
+				_id: 'viewer',
+				firstName: 'Viewer',
+				lastName: 'User',
+				username: 'viewer',
+				isAdmin: false
+			};
+			findStatus.mockResolvedValue({
+				success: true,
+				rows: [{ _userId: user.value, status: 'Yes', numberOfGuests: 2 }]
+			});
+			render(Page);
+			await expect.element(page.getByRole('heading', { name: "Today's game" })).toBeVisible();
+			const plans = Array.from(document.querySelectorAll('h2'))
+				.find((h) => h.textContent === 'Your plans')!
+				.parentElement!.parentElement!.getBoundingClientRect();
+			const summary = Array.from(document.querySelectorAll('h2'))
+				.find((h) => h.textContent === "Today's game")!
+				.parentElement!.parentElement!.getBoundingClientRect();
+			if (width >= 1024) {
+				expect(plans.right).toBeLessThan(summary.left);
+				expect(Math.abs(plans.top - summary.top)).toBeLessThan(1);
+			} else {
+				expect(plans.bottom).toBeLessThanOrEqual(summary.top);
+			}
+			expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
+		}
+	);
 });

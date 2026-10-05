@@ -11,35 +11,28 @@
 	// $state
 	let isRowsPending = $state(true);
 	let isAttendancePending = $state(false);
+	let hasSubmittedAttendance = $state(false);
 	let toasts: ToastItem[] = $state([]);
 	let rows: any[] = $state([]);
-	let timestamp = $state(new Date().getTime());
 
 	// variables
 	const statuses = [
 		{
 			className:
 				'bg-green-500 hover:bg-green-600 focus:bg-green-600 focus:outline-green-500/30 dark:focus:outline-green-500/30 ',
-			emoji: '👍',
 			status: 'Yes'
 		},
 		{
 			className:
 				'bg-amber-500 hover:bg-amber-600 focus:bg-amber-600 focus:outline-amber-500/30 dark:focus:outline-amber-500/30 ',
-			emoji: '🤷',
 			status: 'Maybe'
 		},
 		{
 			className:
 				'bg-red-500 hover:bg-red-600 focus:bg-red-600 focus:outline-red-500/30 dark:focus:outline-red-500/30 ',
-			emoji: '👎',
 			status: 'No'
 		}
 	];
-	const step = () => {
-		timestamp = new Date().getTime();
-		requestAnimationFrame(step);
-	};
 	const updateRows = async () => {
 		try {
 			const query = findUserCalendarStatus({ date: dateString });
@@ -52,6 +45,7 @@
 					)
 				);
 				isRowsPending = false;
+				hasSubmittedAttendance = rows.some((row) => row._userId._id === user.value?._id);
 			}
 		} catch (error) {}
 	};
@@ -98,6 +92,7 @@
 				status
 			});
 			if (!result.success) throw new Error('Save failed');
+			hasSubmittedAttendance = true;
 			toasts = [
 				{ id: 'attendance', message: 'Attendance saved.', status: 'success', duration: 2500 }
 			];
@@ -144,47 +139,11 @@
 		}, 0)
 	);
 	const nextBasketballDate = $derived.by(() => {
-		return new Date(listDates[0]);
+		return listDates[0];
 	});
-	const timeRemaining = $derived.by(() => {
-		let remainingMilliseconds = new Date(nextBasketballDate).getTime() - timestamp;
-
-		const days = Math.floor(remainingMilliseconds / 1000 / 60 / 60 / 24);
-		remainingMilliseconds -= days * 1000 * 60 * 60 * 24;
-
-		const hours = Math.floor(remainingMilliseconds / 1000 / 60 / 60);
-		remainingMilliseconds -= hours * 1000 * 60 * 60;
-
-		const minutes = Math.floor(remainingMilliseconds / 1000 / 60);
-		remainingMilliseconds -= minutes * 1000 * 60;
-
-		const seconds = Math.floor(remainingMilliseconds / 1000);
-		remainingMilliseconds -= seconds * 1000;
-
-		let array = [];
-
-		if (days > 0) array.push(`${days} day${days !== 1 ? 's' : ''}`);
-		if (hours > 0) array.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
-		if (minutes > 0) array.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
-		if (seconds > 0) array.push(`${seconds} second${seconds !== 1 ? 's' : ''}`);
-
-		const display = array.join(', ');
-
-		return {
-			days,
-			hours,
-			minutes,
-			seconds,
-			display
-		};
-	});
-
 	// $effects
 	$effect(() => {
 		if (isRowsPending) updateRows();
-	});
-	$effect(() => {
-		requestAnimationFrame(step);
 	});
 </script>
 
@@ -206,55 +165,104 @@
 {#if user.value}
 	<H1>Hi {user.value.firstName}!</H1>
 	{#if scheduledDates.value.includes(dateString)}
-		<Div class="flex space-x-4">
-			{@render statusUpdate()}
-			{@render guests()}
-		</Div>
-		{#if isAnswered}
-			<Card
-				class={twMerge(
-					'text-white dark:text-white',
-					committed + maybies / 2 >= 10
-						? 'bg-green-500 dark:bg-green-500'
-						: 'bg-red-500 dark:bg-red-500'
-				)}
-			>
-				We currently have {committed} committed{maybies !== 0
-					? ` and ${maybies} ${maybies === 1 ? 'maybe' : 'maybies'}`
-					: ''}.<br />
-				{#if committed + maybies / 2 >= 10}Game On!{:else}Need More!{/if}
+		<div
+			class="grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start"
+		>
+			<Card class="min-w-0 gap-6">
+				<div>
+					<h2 class="text-xl font-semibold">Your plans</h2>
+					<p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+						Basketball is scheduled for today.
+					</p>
+				</div>
+				{@render statusUpdate()}
+				<hr class="border-0 border-t border-gray-200 dark:border-gray-700" />
+				{@render guests()}
 			</Card>
-			<Card class="relative grid grid-cols-[auto_auto] overflow-auto p-0 lg:mr-auto">
-				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-white">Name</Div>
-				<Div class="sticky top-0 bg-primary-700 px-6 py-3 text-center text-white">Status</Div>
-				{#if !isRowsPending}
-					{#if rows.length !== 0}
-						{#each allRows as { name, status }, rowIndex}
-							{@render rowSnippet({
-								name,
-								rowIndex,
-								status
-							})}
-						{/each}
-					{:else}
-						<Div class={twMerge('col-span-2 px-6 py-3')}>No One Signed Up</Div>
-					{/if}
-				{:else}
-					<Div class="col-span-2 px-6 py-3">
-						<Spinner />
-					</Div>
-				{/if}
-			</Card>
-		{/if}
+			{#if hasSubmittedAttendance && isAnswered}
+				<div class="flex min-w-0 flex-col gap-6">
+					<Card class="gap-4">
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<h2 class="text-xl font-semibold">Today's game</h2>
+							{#if !isRowsPending}
+								<span
+									class={committed + maybies / 2 >= 10
+										? 'rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-800 dark:bg-green-950 dark:text-green-200'
+										: 'rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800 dark:bg-amber-950 dark:text-amber-200'}
+									>{committed + maybies / 2 >= 10 ? 'Game on!' : 'Need more players'}</span
+								>
+							{/if}
+						</div>
+						{#if isRowsPending}
+							<p role="status" class="flex items-center gap-2 text-sm">
+								<Spinner class="size-4" />Loading attendance...
+							</p>
+						{:else}
+							<div class="grid grid-cols-2 gap-4" role="group" aria-label="Attendance summary">
+								<div class="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+									<span class="block text-3xl font-semibold">{committed}</span><span
+										class="text-sm text-gray-600 dark:text-gray-400">Committed</span
+									>
+								</div>
+								<div class="rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
+									<span class="block text-3xl font-semibold">{maybies}</span><span
+										class="text-sm text-gray-600 dark:text-gray-400">Maybe</span
+									>
+								</div>
+							</div>
+							<p class="text-sm text-gray-600 dark:text-gray-400">
+								Guest counts are included in committed players.
+							</p>
+						{/if}
+					</Card>
+					<Card class="min-w-0 gap-4">
+						<h2 class="text-xl font-semibold">Who's coming</h2>
+						{#if !isRowsPending}
+							{#if allRows.length}
+								<table class="w-full table-fixed text-left text-sm">
+									<thead
+										><tr
+											class="border-b border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-400"
+											><th scope="col" class="pb-3 font-medium">Player</th><th
+												scope="col"
+												class="w-24 pb-3 text-right font-medium">Status</th
+											></tr
+										></thead
+									>
+									<tbody>
+										{#each allRows as { name, status }}
+											<tr class="border-b border-gray-100 last:border-0 dark:border-gray-800">
+												<td class="py-3 pr-3 break-words">{name}</td>
+												<td class="py-3 text-right"
+													><span
+														class={status === 'Yes'
+															? 'inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-950 dark:text-green-200'
+															: status === 'Maybe'
+																? 'inline-block rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200'
+																: 'inline-block rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300'}
+														>{status}</span
+													></td
+												>
+											</tr>
+										{/each}
+									</tbody>
+								</table>
+							{:else}<p class="text-sm text-gray-600 dark:text-gray-400">
+									No one has answered yet.
+								</p>{/if}
+						{:else}<p class="text-sm text-gray-600 dark:text-gray-400">Loading players...</p>{/if}
+					</Card>
+				</div>
+			{/if}
+		</div>
 	{:else}
 		{@render noBasketball()}
 	{/if}
 {/if}
-
 {#snippet guests()}
-	<Div class="flex flex-col space-y-2">
+	<Div class="flex flex-col gap-3">
 		<Div>Guests - {numberOfGuests}</Div>
-		<Div class="flex space-x-2">
+		<Div class="flex gap-3">
 			<Button
 				type="button"
 				aria-label="Add guest"
@@ -280,53 +288,34 @@
 	</Div>
 {/snippet}
 {#snippet noBasketball()}
-	<Div>No Basketball Scheduled For Today</Div>
-	<Div>
-		The Next Basketball Date Is {nextBasketballDate.toLocaleString('default', {
-			month: 'long',
-			day: 'numeric',
-			weekday: 'long'
-		})}
-	</Div>
-{/snippet}
-{#snippet rowSnippet({
-	name,
-	rowIndex,
-	status
-}: {
-	name: string;
-	rowIndex: number;
-	status: string;
-})}
-	<Div
-		class={twMerge('px-6 py-3', rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined)}
-	>
-		{name}
-	</Div>
-	<Div
-		class={twMerge(
-			'px-6 py-3',
-			rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-800' : undefined,
-			'text-center'
-		)}
-	>
-		{status}
-	</Div>
+	<Card class="w-full max-w-xl gap-3">
+		<h2 class="text-xl font-semibold">No basketball scheduled for today</h2>
+		{#if nextBasketballDate}<p class="text-gray-600 dark:text-gray-400">
+				The next basketball date is {nextBasketballDate.toLocaleString('default', {
+					month: 'long',
+					day: 'numeric',
+					weekday: 'long'
+				})}.
+			</p>
+		{:else}<p class="text-gray-600 dark:text-gray-400">No upcoming dates are scheduled yet.</p>{/if}
+	</Card>
 {/snippet}
 {#snippet statusUpdate()}
-	<Div class="flex flex-col space-y-2">
+	<Div class="flex flex-col gap-3">
 		<Div>Will you be coming?</Div>
-		<Div class="flex space-x-2">
-			{#each statuses as { className, emoji, status }}
+		<Div class="grid grid-cols-3 gap-2">
+			{#each statuses as { className, status }}
 				<Button
 					type="button"
 					disabled={isRowsPending || isAttendancePending}
 					class={twMerge(
+						'min-w-0 px-3 py-3',
 						className,
 						answer?.status !== status
 							? 'bg-gray-500 hover:bg-gray-600 focus:bg-gray-600 focus:outline-gray-500/30 dark:focus:outline-gray-500/30'
 							: undefined
 					)}
+					aria-pressed={answer?.status === status}
 					onclick={() => saveAttendance(status, numberOfGuests)}
 				>
 					{status}
