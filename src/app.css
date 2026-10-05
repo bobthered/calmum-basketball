@@ -13,33 +13,42 @@
 	}
 }
 
-/* Only Settings navigations opt into these mobile page transitions. */
+/* Settings and Admin navigations opt into these mobile page transitions. */
 @media (max-width: 1023px) and (prefers-reduced-motion: no-preference) {
 	html[data-settings-direction]::view-transition-old(root),
-	html[data-settings-direction]::view-transition-new(root) {
+	html[data-admin-direction]::view-transition-old(root),
+	html[data-settings-direction]::view-transition-new(root),
+	html[data-admin-direction]::view-transition-new(root) {
 		animation: none;
 	}
-	html[data-settings-direction]::view-transition-group(settings-page) {
+	html[data-settings-direction]::view-transition-group(settings-page),
+	html[data-admin-direction]::view-transition-group(admin-page) {
 		animation-duration: 240ms;
 	}
 	html[data-settings-direction]::view-transition-old(settings-page),
-	html[data-settings-direction]::view-transition-new(settings-page) {
+	html[data-admin-direction]::view-transition-old(admin-page),
+	html[data-settings-direction]::view-transition-new(settings-page),
+	html[data-admin-direction]::view-transition-new(admin-page) {
 		mix-blend-mode: normal;
 		animation-duration: 240ms;
 		animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 		animation-fill-mode: both;
 	}
-	html[data-settings-direction='forward']::view-transition-old(settings-page) {
+	html[data-settings-direction='forward']::view-transition-old(settings-page),
+	html[data-admin-direction='forward']::view-transition-old(admin-page) {
 		animation-name: settings-retreat;
 	}
-	html[data-settings-direction='forward']::view-transition-new(settings-page) {
+	html[data-settings-direction='forward']::view-transition-new(settings-page),
+	html[data-admin-direction='forward']::view-transition-new(admin-page) {
 		animation-name: settings-enter;
 	}
-	html[data-settings-direction='back']::view-transition-old(settings-page) {
+	html[data-settings-direction='back']::view-transition-old(settings-page),
+	html[data-admin-direction='back']::view-transition-old(admin-page) {
 		animation-name: settings-exit;
 		z-index: 2;
 	}
-	html[data-settings-direction='back']::view-transition-new(settings-page) {
+	html[data-settings-direction='back']::view-transition-new(settings-page),
+	html[data-admin-direction='back']::view-transition-new(admin-page) {
 		animation-name: settings-return;
 		z-index: 1;
 	}

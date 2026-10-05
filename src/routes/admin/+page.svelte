@@ -38,6 +38,3 @@
 		</A>
 	{/each}
 </Card>
-<A href="/admin/display-diagnostics" variants={['ghost']} class="self-start text-sm"
-	>Check app display</A
->

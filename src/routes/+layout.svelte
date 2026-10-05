@@ -2,8 +2,6 @@
 	import { Calendar, Settings, Menu, MessageCircle, ShieldUser, X } from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import { page } from '$app/state';
-	import { onMount } from 'svelte';
-	import { startDisplayDiagnostics } from '#lib/ui/display-diagnostics.js';
 	import { isActiveRoute } from '#lib/ui/navigation.js';
 	import {
 		BasketballIcon,
@@ -27,7 +25,6 @@
 	import '../app.css';
 
 	let { children } = $props();
-	onMount(startDisplayDiagnostics);
 
 	// $state
 
@@ -106,7 +103,9 @@
 <Main
 	class={twMerge(
 		'flex grow flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]',
-		page.url.pathname.startsWith('/settings') ? 'p-0 pt-0 lg:p-4' : ''
+		page.url.pathname.startsWith('/settings') || page.url.pathname.startsWith('/admin')
+			? 'p-0 pt-0 lg:p-4'
+			: ''
 	)}
 >
 	{#if user.value !== null}
