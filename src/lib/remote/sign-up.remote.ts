@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 import * as v from 'valibot';
 import { form } from '$app/server';
+import { createSession, publicUser } from '#lib/server/session.js';
 import { connect } from '#lib/mongoose/connect.js';
 import { User } from '#lib/mongoose/models/index.js';
 
@@ -19,9 +20,8 @@ export const signUp = form(
 			const passwordHash = await bcrypt.hash(password, 10);
 			const result = await User.create({ firstName, lastName, passwordHash, username });
 
-			const { passwordHash: _, __v, ...user } = result;
-
-			return JSON.parse(JSON.stringify({ success: true, ...user }));
+			await createSession(String(result._id));
+			return { success: true, user: publicUser(result) };
 		} catch (e: any) {
 			let message: string = 'Could not create user';
 			if (e.code === 11000) message = 'Username already exists';

@@ -8,6 +8,8 @@
 	"name": "Cal-Mum Rec. Basketball",
 	"short_name": "CM BB",
 	"start_url": "/",
+	"id": "/",
+	"scope": "/",
 	"description": "Cal-Mum Rec. Basketball",
 	"icons": [
 		{

@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { Calendar, CircleUserRound, LogOut, ShieldUser, Users } from '@lucide/svelte';
+	import {
+		Calendar,
+		CircleUserRound,
+		LogOut,
+		MessageCircle,
+		ShieldUser,
+		Users
+	} from '@lucide/svelte';
 	import { twMerge } from 'tailwind-merge';
 	import {
 		BasketballIcon,
@@ -17,6 +24,8 @@
 	import SignUpModal from '#components/SignUpModal.svelte';
 	import { findCalendar } from '#lib/remote/find-calendar.remote.js';
 	import { scheduledDates, user } from '#lib/state/index.js';
+	import { signOut as endSession } from '#lib/remote/session.remote.js';
+	import { disableNotifications } from '#lib/notifications.js';
 	import '../app.css';
 
 	let { children } = $props();
@@ -28,29 +37,47 @@
 	]);
 	let isAdminPopoverOpen = $state(false);
 	let isScheduledDateInitiated = $state(false);
+	let calendarError = $state('');
 	let nav = $state([
 		{ href: '/', Icon: BasketballIcon, label: 'Home' },
 		{ href: '/calendar', Icon: Calendar, label: 'Calendar' },
+		{ href: '/messages', Icon: MessageCircle, label: 'Chat' },
 		{ href: '/my-account', Icon: CircleUserRound, label: 'My Account' }
 	]);
 
-	const signOut = () => {
-		localStorage.removeItem('_id');
-		user.value = null;
+	const signOut = async () => {
+		try {
+			try {
+				await disableNotifications();
+			} catch {
+				/* Session logout must still work if push cleanup fails. */
+			}
+			await endSession();
+			localStorage.removeItem('_id');
+			user.value = null;
+		} catch {
+			alert('Could not sign out. Please try again.');
+		}
 	};
 	const updateScheduledDates = async () => {
-		const result = await findCalendar();
-		scheduledDates.value = result.map(({ date }: { date: string }) => date);
-		isScheduledDateInitiated = true;
+		calendarError = '';
+		try {
+			const result = await findCalendar();
+			scheduledDates.value = result.map(({ date }: { date: string }) => date);
+		} catch {
+			calendarError = 'Could not load the basketball calendar. Refresh to try again.';
+		} finally {
+			isScheduledDateInitiated = true;
+		}
 	};
 
 	// $derives
-	const isLoadingModalOpen = $derived.by(() => !isScheduledDateInitiated);
+	const isLoadingModalOpen = $derived.by(() => Boolean(user.value) && !isScheduledDateInitiated);
 	const navItemCount = $derived.by(() => nav.length + 1 + (user?.value?.isAdmin ? 1 : 0));
 
 	// $effects
 	$effect(() => {
-		updateScheduledDates();
+		if (user.value && !isScheduledDateInitiated) updateScheduledDates();
 	});
 </script>
 
@@ -73,6 +100,7 @@
 	class="flex grow flex-col space-y-6 overflow-auto p-4 pt-[calc(env(safe-area-inset-top)+1rem)]"
 >
 	{#if user.value !== null}
+		{#if calendarError}<p role="alert" class="text-red-600">{calendarError}</p>{/if}
 		{@render children?.()}
 	{/if}
 </Main>

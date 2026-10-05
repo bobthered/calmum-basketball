@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import * as v from 'valibot';
 import { command } from '$app/server';
+import { requireAdmin } from '#lib/server/session.js';
 import { connect } from '#lib/mongoose/connect.js';
 import { User } from '#lib/mongoose/models/index.js';
 
@@ -13,6 +14,7 @@ export const updateUserField = command(
 		username: v.optional(v.string())
 	}),
 	async ({ _id, firstName, isAdmin, lastName, username }) => {
+		requireAdmin();
 		await connect();
 
 		let update: { firstName?: string; isAdmin?: boolean; lastName?: string; username?: string } =

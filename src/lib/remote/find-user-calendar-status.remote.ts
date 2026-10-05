@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { query } from '$app/server';
+import { requireUser } from '#lib/server/session.js';
 import { connect } from '#lib/mongoose/connect.js';
 import { UserCalendarStatus } from '#lib/mongoose/models/index.js';
 
@@ -8,9 +9,10 @@ export const findUserCalendarStatus = query(
 		date: v.pipe(v.string(), v.nonEmpty())
 	}),
 	async ({ date }) => {
+		requireUser();
 		await connect();
 
-		const rows = await UserCalendarStatus.find({ date }).populate('_userId');
+		const rows = await UserCalendarStatus.find({ date }).populate('_userId', 'firstName lastName');
 
 		return JSON.parse(JSON.stringify({ success: true, rows }));
 	}

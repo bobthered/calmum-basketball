@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import { command } from '$app/server';
+import { requireAdmin } from '#lib/server/session.js';
 import { connect } from '#lib/mongoose/connect.js';
 import { Calendar } from '#lib/mongoose/models/index.js';
 
@@ -9,6 +10,7 @@ export const updateCalendar = command(
 		isScheduled: v.pipe(v.boolean())
 	}),
 	async ({ date, isScheduled }) => {
+		requireAdmin();
 		await connect();
 
 		if (isScheduled) {

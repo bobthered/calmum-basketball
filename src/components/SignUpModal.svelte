@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack, type Snippet } from 'svelte';
+	import { onMount, untrack, type Snippet } from 'svelte';
 	import { type Attachment } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { browser } from '$app/env';
@@ -16,7 +16,7 @@
 		SubmitButton
 	} from '#components';
 	import { slide } from '#lib/transition/index.js';
-	import { findCurrentUser } from '#lib/remote/find-current-user.remote.js';
+	import { currentSession, migrateLegacyLogin } from '#lib/remote/session.remote.js';
 	import { signUp } from '#lib/remote/sign-up.remote.js';
 	import { user } from '#lib/state/user/index.js';
 	import { signIn } from '#lib/remote/sign-in.remote.js';
@@ -43,39 +43,35 @@
 	let errorMessage: string | null = $state(null);
 	let formDisplay: 'Sign In' | 'Sign Up' = $state('Sign Up');
 	let isOpen = $state(false);
+	let restored = $state(false);
 	let isPending = $state(false);
 	let firstName = $state('');
 	let lastName = $state('');
 	let password = $state('');
 	let username = $state('');
 
-	const updateUser = async (_id: string) => {
-		const result = await findCurrentUser({ _id });
-		if (result.user === null) {
-			localStorage.removeItem('_id');
-			isOpen = true;
-			return;
-		}
-		user.value = {
-			_id: result.user._id,
-			firstName: result.user.firstName,
-			isAdmin: result.user.isAdmin,
-			lastName: result.user.lastName,
-			username: result.user.username
-		};
-	};
-
-	// $effects
-	$effect(() => {
-		if (browser) {
-			if (user.value === null) {
-				const _id = localStorage.getItem('_id');
-				if (!_id) isOpen = true;
-				if (_id) {
-					updateUser(_id);
-				}
+	onMount(() => {
+		void (async () => {
+			try {
+				let account = await currentSession();
+				const legacyId = localStorage.getItem('_id');
+				if (!account && legacyId) account = await migrateLegacyLogin(legacyId);
+				if (account) {
+					user.value = account;
+					localStorage.removeItem('_id');
+					isOpen = false;
+				} else isOpen = true;
+			} catch (err) {
+				errorMessage =
+					err instanceof Error ? err.message : 'Could not restore your sign-in. Please try again.';
+				isOpen = true;
+			} finally {
+				restored = true;
 			}
-		}
+		})();
+	});
+	$effect(() => {
+		if (restored && browser && !user.value) isOpen = true;
 	});
 	$effect(() => {
 		const firstNameValue = firstName;
@@ -107,24 +103,14 @@
 				isPending = true;
 				await submit();
 				isPending = false;
-				if (signIn.result.success) {
-					const userObject = {
-						_id: signIn.result._doc._id,
-						firstName: signIn.result._doc.firstName,
-						isAdmin: signIn.result._doc.isAdmin,
-						lastName: signIn.result._doc.lastName,
-						username: signIn.result._doc.username
-					};
-					localStorage.setItem('_id', signIn.result._doc._id);
-					user.value = userObject;
+				if (signIn.result?.success) {
+					user.value = signIn.result.user;
+					localStorage.removeItem('_id');
 					isOpen = false;
 				}
 			} catch (err: any) {
 				isPending = false;
-				const {
-					body: { message }
-				} = err;
-				errorMessage = message;
+				errorMessage = err?.body?.message ?? err?.message ?? 'Please try again.';
 			}
 		})}
 	>
@@ -176,24 +162,14 @@
 				isPending = true;
 				await submit();
 				isPending = false;
-				if (signUp.result.success) {
-					const userObject = {
-						_id: signUp.result._doc._id,
-						firstName: signUp.result._doc.firstName,
-						isAdmin: signUp.result._doc.isAdmin,
-						lastName: signUp.result._doc.lastName,
-						username: signUp.result._doc.username
-					};
-					localStorage.setItem('_id', signUp.result._doc._id);
-					user.value = userObject;
+				if (signUp.result?.success) {
+					user.value = signUp.result.user;
+					localStorage.removeItem('_id');
 					isOpen = false;
 				}
 			} catch (err: any) {
 				isPending = false;
-				const {
-					body: { message }
-				} = err;
-				errorMessage = message;
+				errorMessage = err?.body?.message ?? err?.message ?? 'Please try again.';
 			}
 		})}
 	>
