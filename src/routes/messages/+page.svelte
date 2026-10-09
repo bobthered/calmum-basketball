@@ -70,6 +70,8 @@
 
 	let initialized = $state(false);
 
+	let isInitialScrollPending = $state(true);
+
 	let loadingOlder = $state(false);
 
 	let pending: {
@@ -115,14 +117,15 @@
 	});
 
 	$effect(() => {
+		const area = scrollArea;
 		const latestId = messages.at(-1)?.id;
-		if (latestId)
+		if (area && latestId)
 			untrack(() => {
-				const atBottom =
-					!scrollArea ||
-					scrollArea.scrollHeight - scrollArea.scrollTop - scrollArea.clientHeight < 160;
-				if (atBottom)
-					void tick().then(() => scrollArea?.scrollTo({ top: scrollArea.scrollHeight }));
+				const atBottom = area.scrollHeight - area.scrollTop - area.clientHeight < 160;
+				if (isInitialScrollPending || atBottom) {
+					isInitialScrollPending = false;
+					void tick().then(() => area.scrollTo({ top: area.scrollHeight }));
+				}
 			});
 	});
 

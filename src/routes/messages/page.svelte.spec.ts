@@ -2,11 +2,18 @@ import { page } from 'vitest/browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from 'vitest-browser-svelte';
 import { user } from '#lib/state/index.js';
-const mocks = vi.hoisted(() => ({ send: vi.fn(), older: vi.fn(), reconnect: vi.fn() }));
+import type { ChatMessage } from '#lib/types/messages.js';
+import '../../app.css';
+const mocks = vi.hoisted(() => ({
+	messages: null as ChatMessage[] | null,
+	older: vi.fn(),
+	reconnect: vi.fn(),
+	send: vi.fn()
+}));
 vi.mock('#lib/remote/messages.remote.js', () => ({
 	groupMessages: () => ({
 		current: {
-			messages: [
+			messages: mocks.messages ?? [
 				{
 					id: 'a',
 					senderId: 'other',
@@ -39,6 +46,7 @@ import Page from './+page.svelte';
 afterEach(() => {
 	cleanup();
 	user.value = null;
+	mocks.messages = null;
 	vi.clearAllMocks();
 });
 const openChat = () => {
@@ -52,6 +60,35 @@ const openChat = () => {
 	render(Page);
 };
 describe('group chat', () => {
+	it('scrolls a long message history to the bottom on load', async () => {
+		mocks.messages = Array.from({ length: 50 }, (_, index) => ({
+			clientId: `history-${index}`,
+			createdAt: new Date(Date.UTC(2026, 9, 4, 10, index)).toISOString(),
+			id: `history-${index}`,
+			senderId: 'other',
+			senderName: 'Player A',
+			text: `History message ${index}`
+		}));
+		const style = document.createElement('style');
+		style.textContent =
+			'[aria-label="Group messages"] { height: 240px; max-height: 240px; min-height: 0; flex: none; }';
+		document.head.append(style);
+		try {
+			openChat();
+			await expect
+				.element(page.getByText('History message 49', { exact: true }))
+				.toBeInTheDocument();
+			const area = document.querySelector<HTMLElement>('[aria-label="Group messages"]')!;
+			await vi.waitFor(() => {
+				expect(area.scrollHeight).toBeGreaterThan(area.clientHeight + 160);
+				expect(
+					Math.abs(area.scrollHeight - area.clientHeight - area.scrollTop)
+				).toBeLessThanOrEqual(1);
+			});
+		} finally {
+			style.remove();
+		}
+	});
 	it('renders message text safely and sends a message from the composer', async () => {
 		mocks.send.mockResolvedValue({
 			id: 'b',
