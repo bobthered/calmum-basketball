@@ -8,10 +8,11 @@
 	} from '#lib/remote/messages.remote.js';
 	import { user } from '#lib/state/index.js';
 	import { type ChatMessage, mergeMessages } from '#lib/types/messages.js';
+	import { startChatPolling } from '#lib/ui/chat-polling.js';
 	import { onMount, tick, untrack } from 'svelte';
 
 	// Constants
-	const live = groupMessages();
+	const latest = groupMessages();
 
 	// Helper functions
 	const errorText = (err: unknown, fallback: string) =>
@@ -33,6 +34,25 @@
 			historyError = errorText(err, 'Could not load older messages.');
 		} finally {
 			loadingOlder = false;
+		}
+	};
+
+	const refreshMessages = async () => {
+		if (isRefreshing) return;
+		isRefreshing = true;
+		try {
+			await latest.refresh();
+			const current = await latest;
+			received = mergeMessages(received, current.messages);
+			if (!initialized) {
+				hasMore = current.hasMore;
+				initialized = true;
+			}
+			refreshError = '';
+		} catch (err) {
+			refreshError = errorText(err, 'Could not update chat. Please try again.');
+		} finally {
+			isRefreshing = false;
 		}
 	};
 
@@ -72,6 +92,8 @@
 
 	let isInitialScrollPending = $state(true);
 
+	let isRefreshing = $state(false);
+
 	let loadingOlder = $state(false);
 
 	let pending: {
@@ -80,6 +102,8 @@
 	} | null = $state(null);
 
 	let received: ChatMessage[] = $state([]);
+
+	let refreshError = $state('');
 
 	let scrollArea: HTMLDivElement | null = $state(null);
 
@@ -96,27 +120,6 @@
 
 	// $effects
 	$effect(() => {
-		const current = live.current;
-		if (current)
-			untrack(() => {
-				received = mergeMessages(received, current.messages);
-				if (!initialized) {
-					hasMore = current.hasMore;
-					initialized = true;
-				}
-			});
-	});
-
-	$effect(() => {
-		if (initialized && !live.connected && !live.error) {
-			const timer = setTimeout(() => {
-				void live.reconnect();
-			}, 1000);
-			return () => clearTimeout(timer);
-		}
-	});
-
-	$effect(() => {
 		const area = scrollArea;
 		const latestId = messages.at(-1)?.id;
 		if (area && latestId)
@@ -129,13 +132,7 @@
 			});
 	});
 
-	onMount(() => {
-		const reconnect = () => {
-			if (document.visibilityState === 'visible') void live.reconnect();
-		};
-		document.addEventListener('visibilitychange', reconnect);
-		return () => document.removeEventListener('visibilitychange', reconnect);
-	});
+	onMount(() => startChatPolling(refreshMessages));
 </script>
 
 <svelte:head><title>Basketball Chat | Cal-Mum Rec. Basketball</title></svelte:head>
@@ -144,13 +141,13 @@
 	<Div class="flex flex-wrap items-center justify-between gap-2">
 		<H1>Chat</H1>
 		<Span class="text-sm text-gray-600 dark:text-gray-400" role="status">
-			{live.connected ? 'Live' : 'Reconnecting...'}
+			{refreshError ? 'Retrying...' : initialized ? 'Auto-updates' : 'Connecting...'}
 		</Span>
 	</Div>
-	{#if live.error}
+	{#if refreshError}
 		<Div role="alert" class="flex flex-wrap items-center gap-2 text-red-600 dark:text-red-400">
-			<P>Could not connect to chat. {live.error.message}</P>
-			<Button onclick={() => live.reconnect()}>Reconnect</Button>
+			<P>{refreshError}</P>
+			<Button disabled={isRefreshing} onclick={refreshMessages}>Retry</Button>
 		</Div>
 	{/if}
 	<Div

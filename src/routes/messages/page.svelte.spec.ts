@@ -7,27 +7,26 @@ import '../../app.css';
 const mocks = vi.hoisted(() => ({
 	messages: null as ChatMessage[] | null,
 	older: vi.fn(),
-	reconnect: vi.fn(),
+	refresh: vi.fn(),
 	send: vi.fn()
 }));
 vi.mock('#lib/remote/messages.remote.js', () => ({
 	groupMessages: () => ({
-		current: {
-			messages: mocks.messages ?? [
-				{
-					id: 'a',
-					senderId: 'other',
-					senderName: 'Player A',
-					text: '<script>alert("hello")</script>',
-					createdAt: '2026-10-04T10:00:00.000Z',
-					clientId: 'a'
-				}
-			],
-			hasMore: false
-		},
-		connected: true,
-		error: undefined,
-		reconnect: mocks.reconnect
+		then: (resolve: (value: unknown) => void) =>
+			Promise.resolve({
+				messages: mocks.messages ?? [
+					{
+						id: 'a',
+						senderId: 'other',
+						senderName: 'Player A',
+						text: '<script>alert("hello")</script>',
+						createdAt: '2026-10-04T10:00:00.000Z',
+						clientId: 'a'
+					}
+				],
+				hasMore: false
+			}).then(resolve),
+		refresh: mocks.refresh
 	}),
 	sendGroupMessage: mocks.send,
 	olderGroupMessages: mocks.older

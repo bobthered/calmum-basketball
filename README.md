@@ -80,9 +80,13 @@ retries once daily at 12:00 UTC.
 
 The Chat tab contains one shared, text-only basketball conversation. Messages are
 stored in MongoDB, with a bounded server cache of the latest 50 messages. Older
-messages load on demand. SvelteKit `query.live` uses immediate process-local
-wakeups and five-second database reconciliation to synchronize separate Vercel
-instances. Live connections renew before the Hobby function duration limit.
+messages load on demand. Chat uses short SvelteKit remote queries every five seconds
+while the Chat screen is visible and online. Polling pauses in hidden tabs and on
+navigation, resumes immediately on return, and waits for each request to finish
+before scheduling another. A one-second process-local cache coalesces nearby reads;
+other users' messages typically appear within about five to six seconds plus request
+time. The sender sees their saved message immediately. No persistent chat stream
+keeps a Vercel function running between updates.
 
 Login now uses a persistent, HttpOnly session cookie with a 90-day lifetime,
 renewed after half its lifetime. Existing local-storage user IDs automatically
@@ -122,11 +126,11 @@ wait until the daily retry. Jobs expire after 24 hours. Push services/device
 settings can delay or suppress delivery, and crash recovery is at-least-once
 (the service worker uses a message-specific notification tag to replace repeats).
 For frequent background retries, replace the daily cron with a durable queue or
-a more frequent scheduler on an appropriate plan. No chat data or live responses
+a more frequent scheduler on an appropriate plan. No chat data or chat responses
 are cached by the service worker.
 
 Before rollout, test with two accounts on actual Android and iOS devices: migrate
 an existing login, send/receive, close and reopen, enable notifications, receive a
 notification with the app closed, tap it, and verify logout. Automated tests cover
-session behavior, persistence/retry handling, live wakeups, notification delivery
+session behavior, persistence/retry handling, polling lifecycle, notification delivery
 rules, and the chat composer; they do not prove real-device push delivery.

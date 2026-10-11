@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 const worker = self as unknown as ServiceWorkerGlobalScope;
 
-// No response caching: authenticated data and query.live streams must remain private and uncached.
+// No response caching: authenticated data and chat queries must remain private and uncached.
 worker.addEventListener('push', (event) => {
 	let payload: { title?: string; body?: string; messageId?: string; url?: string } = {};
 	try {

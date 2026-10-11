@@ -75,7 +75,7 @@ export const readMessages = async (before?: MessageCursor): Promise<MessagePage>
 	return { messages: rows.slice(0, 50).reverse().map(serializeMessage), hasMore: rows.length > 50 };
 };
 export const latestMessages = async (): Promise<MessagePage> => {
-	if (cached && Date.now() - cachedAt < 4000) return cached;
+	if (cached && Date.now() - cachedAt < 1000) return cached;
 	if (loading) return loading;
 	const revision = groupSignal.revision;
 	loading = readMessages()
